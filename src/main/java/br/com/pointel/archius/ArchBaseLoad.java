@@ -24,14 +24,14 @@ public class ArchBaseLoad {
     private final AtomicInteger doneLoadVerifiers;
     private final AtomicBoolean doneLinterClean;
 
-    public final AtomicInteger statusProgressPos;
-    public final AtomicInteger statusProgressMax;
+    private final AtomicInteger statusProgressPos;
+    private final AtomicInteger statusProgressMax;
 
-    public final AtomicInteger statusNumberOfFiles;
-    public final AtomicInteger statusNumberOfChecked;
-    public final AtomicInteger statusNumberOfVerified;
-    public final AtomicInteger statusNumberOfCleaned;
-    public final AtomicInteger statusNumberOfErros;
+    private final AtomicInteger statusNumberOfFiles;
+    private final AtomicInteger statusNumberOfChecked;
+    private final AtomicInteger statusNumberOfVerified;
+    private final AtomicInteger statusNumberOfCleaned;
+    private final AtomicInteger statusNumberOfErros;
 
     public ArchBaseLoad(ArchBase archBase) throws Exception {
         this(archBase, DEFAULT_SPEED);
@@ -99,12 +99,35 @@ public class ArchBaseLoad {
     }
 
     public Double getProgress() {
-        return ((double) statusProgressPos.get()) / ((double) statusProgressMax.get()) * 100.0;
+        var pos = (double) statusProgressPos.get();
+        var max = (double) statusProgressMax.get();
+        return max > 0 ? pos / max * 100.0 : 0.0;
     }
 
     public String getProgressFormatted() {
         return String.format("%.2f%%", getProgress());
     }
+
+    public Integer getStatusNumberOfFiles() {
+        return statusNumberOfFiles.get();
+    }
+
+    public Integer getStatusNumberOfChecked() {
+        return statusNumberOfChecked.get();
+    }
+
+    public Integer getStatusNumberOfVerified() {
+        return statusNumberOfVerified.get();
+    }
+
+    public Integer getStatusNumberOfCleaned() {
+        return statusNumberOfCleaned.get();
+    }
+
+    public Integer getStatusNumberOfErros() {
+        return statusNumberOfErros.get();
+    }
+
 
     private void loadFiles(File path) {
         if (shouldStop.get()) {

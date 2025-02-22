@@ -70,7 +70,11 @@ public class DeskMenu extends JPopupMenu {
         selectedFolder = WizDesk.selectFolder(selectedFolder);
         if (selectedFolder != null) {
             WizProps.set(LAST_SELECTED_FOLDER, selectedFolder.getAbsolutePath());
-            new DeskOpen(selectedFolder).setVisible(true);
+            try {
+                new DeskOpen(selectedFolder).setVisible(true);
+            } catch (Exception e) {
+                WizDesk.showError(e);
+            }
         }
     }
     
