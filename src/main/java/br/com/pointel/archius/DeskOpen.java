@@ -39,13 +39,12 @@ public class DeskOpen extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(DeskIcon.getLogo());
         setSize(500, 400);
-        setName("archius folder " + folder.getName());
-        setTitle("Archius Folder " + folder.getName());
+        setName("archius on " + folder.getName());
+        setTitle("Archius on " + folder.getName());
         WizDesk.initFrame(this);
         WizDesk.initEscaper(this);
         initComponents();
-        initUpdater();
-        this.archBase.load();
+        archBase.load();
     }
 
     private void initComponents() {
@@ -58,8 +57,12 @@ public class DeskOpen extends JFrame {
         scrollStatus.setViewportView(textStatus);
         textStatus.setLineWrap(true);
         textStatus.setWrapStyleWord(true);
-        pack();
         addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                initUpdater();        
+            }
+
             @Override
             public void windowClosed(WindowEvent e) {
                 WizBase.closeAside(archBase);
@@ -94,12 +97,12 @@ public class DeskOpen extends JFrame {
     }
 
     private void initUpdater() {
-        WizBase.startDaemon(() -> {
+        new Thread(() -> {
             while (isDisplayable()) {
                 WizBase.sleep(500);
                 updateStatus();
             }
-        }, "DeskOpen - Updater");
+        }, "DeskOpen - Updater").start();
     }
 
     private void updateStatus() {

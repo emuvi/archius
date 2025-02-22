@@ -59,7 +59,7 @@ public class DeskMenu extends JPopupMenu {
         WizDesk.addMenu(this, menuExit, e -> callExit());
     }
 
-    private final String LAST_SELECTED_FOLDER = "ArchiusLastSelectedFolder";
+    private final String LAST_SELECTED_FOLDER = "ARCHIUS_LAST_SELECTED_FOLDER";
 
     private void callOpen() {
         var lastSelectedFolder = WizProps.get(LAST_SELECTED_FOLDER, "");

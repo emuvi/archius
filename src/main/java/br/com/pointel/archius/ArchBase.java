@@ -185,6 +185,7 @@ public class ArchBase implements Closeable {
     public void close() throws IOException {
         baseLoad.stop();
         baseData.close();
+        archIndex.close();
     }
 
 }
