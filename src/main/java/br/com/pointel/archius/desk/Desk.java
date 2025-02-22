@@ -15,7 +15,7 @@ public class Desk extends JFrame {
     
     private void initComponents() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setIconImage(deskIcon.getLogo());
+        setIconImage(DeskIcon.getLogo());
         setSize(128, 128);
         setUndecorated(true);
         setName("archius");
