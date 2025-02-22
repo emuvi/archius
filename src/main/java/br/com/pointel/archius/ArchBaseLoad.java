@@ -128,7 +128,6 @@ public class ArchBaseLoad {
         return statusNumberOfErros.get();
     }
 
-
     private void loadFiles(File path) {
         if (shouldStop.get()) {
             return;
@@ -163,11 +162,11 @@ public class ArchBaseLoad {
             try {
                 archBase.sendToListeners("Checking: " + file.getName());
                 var place = archBase.getPlace(file);
-                var baseFile = archBase.getBaseData().getByPlace(place);
+                var baseFile = archBase.getByPlace(place);
                 if (baseFile == null || !Objects.equals(file.length(), baseFile.getModified())) {
                     try (FileInputStream input = new FileInputStream(file)) {
                         var verifier = DigestUtils.sha256Hex(input);
-                        archBase.getBaseData().putFile(place, file.length(), verifier);
+                        archBase.putFile(place, verifier, file.length());
                         archBase.sendToListeners("Putted: " + file.getName());
                         this.statusNumberOfVerified.incrementAndGet();
                     }
@@ -191,7 +190,7 @@ public class ArchBaseLoad {
                     return;
                 }
             }
-            var places = archBase.getBaseData().getAllPlaces();
+            var places = archBase.getAllPlaces();
             statusProgressMax.addAndGet(places.size());
             for (var place : places) {
                 if (this.shouldStop.get()) {
@@ -201,7 +200,7 @@ public class ArchBaseLoad {
                     var file = new File(archBase.getRoot(), place);
                     if (!file.exists()) {
                         archBase.sendToListeners("Cleaning: " + place);
-                        archBase.getBaseData().delFile(place);
+                        archBase.delFile(place);
                         statusNumberOfCleaned.incrementAndGet();
                     }
                 } catch (Exception e) {

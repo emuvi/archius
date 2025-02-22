@@ -120,17 +120,17 @@ public class DeskOpen extends JFrame {
     private String mountStatus() {
         var grid = new ArrayList<Pair<String, String>>();
         grid.add(Pair.of("Loading Progress",
-                        archBase.getBaseLoad().getProgressFormatted()));
+                        archBase.getProgressFormatted()));
         grid.add(Pair.of("Number Of Files",
-                        archBase.getBaseLoad().getStatusNumberOfFiles().toString()));
+                        archBase.getStatusNumberOfFiles().toString()));
         grid.add(Pair.of("Number Of Checked",
-                        archBase.getBaseLoad().getStatusNumberOfChecked().toString()));
+                        archBase.getStatusNumberOfChecked().toString()));
         grid.add(Pair.of("Number Of Verified",
-                        archBase.getBaseLoad().getStatusNumberOfVerified().toString()));
+                        archBase.getStatusNumberOfVerified().toString()));
         grid.add(Pair.of("Number Of Cleaned",
-                        archBase.getBaseLoad().getStatusNumberOfCleaned().toString()));
+                        archBase.getStatusNumberOfCleaned().toString()));
         grid.add(Pair.of("Number Of Erros",
-                        archBase.getBaseLoad().getStatusNumberOfErros().toString()));
+                        archBase.getStatusNumberOfErros().toString()));
         var status = WizChars.mountGrid(grid).trim() + "\n\nLast Status:\n" + lastStatus;
         return status;
     }
