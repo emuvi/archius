@@ -15,24 +15,28 @@ import javax.swing.UIManager;
 
 public class DeskIcon extends JLabel {
 
+    private static Image LOGO;
+
+    static {
+        try {
+            LOGO = ImageIO.read(Desk.class.getResourceAsStream("/img/logo.png"));
+        } catch (Exception e) {
+            LOGO = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+        }
+    }
+    
+    public static Image getLogo() {
+        return LOGO;
+    }
+
     private final Desk desk;
-    private final Image imageLogo;
     private Point mouseDownCompCoords = null;
 
     public DeskIcon(Desk desk) {
         this.desk = desk;
-        this.imageLogo = loadLogo();
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setBorder(UIManager.getBorder("Button.border"));
         this.initActions();
-    }
-    
-    private Image loadLogo() {
-        try {
-            return ImageIO.read(Desk.class.getResourceAsStream("/img/logo.png"));
-        } catch (Exception e) {
-            return new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
-        }
     }
     
     private void initActions() {
@@ -59,10 +63,6 @@ public class DeskIcon extends JLabel {
                 desk.setLocation(currCoords.x - mouseDownCompCoords.x, currCoords.y - mouseDownCompCoords.y);
             }
         });
-    }
-    
-    public Image getLogo() {
-        return this.imageLogo;
     }
     
     @Override
