@@ -30,6 +30,7 @@ public class ArchBaseLoad {
     private final AtomicInteger statusNumberOfFiles;
     private final AtomicInteger statusNumberOfChecked;
     private final AtomicInteger statusNumberOfVerified;
+    private final AtomicInteger statusNumberOfLinted;
     private final AtomicInteger statusNumberOfCleaned;
     private final AtomicInteger statusNumberOfErros;
 
@@ -50,6 +51,7 @@ public class ArchBaseLoad {
         this.statusNumberOfFiles = new AtomicInteger(0);
         this.statusNumberOfChecked = new AtomicInteger(0);
         this.statusNumberOfVerified = new AtomicInteger(0);
+        this.statusNumberOfLinted = new AtomicInteger(0);
         this.statusNumberOfCleaned = new AtomicInteger(0);
         this.statusNumberOfErros = new AtomicInteger(0);
     }
@@ -118,6 +120,10 @@ public class ArchBaseLoad {
 
     public Integer getStatusNumberOfVerified() {
         return statusNumberOfVerified.get();
+    }
+
+    public Integer getStatusNumberOfLinted() {
+        return statusNumberOfLinted.get();
     }
 
     public Integer getStatusNumberOfCleaned() {
@@ -193,6 +199,7 @@ public class ArchBaseLoad {
             var places = archBase.getAllPlaces();
             statusProgressMax.addAndGet(places.size());
             for (var place : places) {
+                statusNumberOfLinted.incrementAndGet();
                 if (this.shouldStop.get()) {
                     return;
                 }

@@ -71,6 +71,10 @@ public class ArchBase implements Closeable {
         return baseLoad.getStatusNumberOfVerified();
     }
 
+    public Integer getStatusNumberOfLinted() {
+        return baseLoad.getStatusNumberOfLinted();
+    }
+
     public Integer getStatusNumberOfCleaned() {
         return baseLoad.getStatusNumberOfCleaned();
     }

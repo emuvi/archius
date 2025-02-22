@@ -127,6 +127,8 @@ public class DeskOpen extends JFrame {
                         archBase.getStatusNumberOfChecked().toString()));
         grid.add(Pair.of("Number Of Verified",
                         archBase.getStatusNumberOfVerified().toString()));
+        grid.add(Pair.of("Number Of Linted",
+                        archBase.getStatusNumberOfLinted().toString()));
         grid.add(Pair.of("Number Of Cleaned",
                         archBase.getStatusNumberOfCleaned().toString()));
         grid.add(Pair.of("Number Of Erros",
