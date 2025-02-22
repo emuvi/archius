@@ -10,13 +10,11 @@ import java.util.List;
 
 public class ArchBaseData implements Closeable {
 
-    private final ArchBase archBase;
     private final Connection connection;
 
-    public ArchBaseData(ArchBase archBase) throws Exception {
-        this.archBase = archBase;
+    public ArchBaseData(File root) throws Exception {
         this.connection = DriverManager.getConnection("jdbc:sqlite:"
-                        + new File(this.archBase.getRoot(), "arch-base.sdb").getAbsolutePath());
+                        + new File(root, "arch-base.sdb").getAbsolutePath());
         this.initDatabase();
     }
 

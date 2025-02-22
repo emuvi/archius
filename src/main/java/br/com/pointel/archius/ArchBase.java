@@ -25,7 +25,7 @@ public class ArchBase implements Closeable {
         this.root = root;
         this.rootLength = this.root.getAbsolutePath().length();
         this.listeners = new ArrayList<>();
-        baseData = new ArchBaseData(this);
+        baseData = new ArchBaseData(root);
         baseLoad = new ArchBaseLoad(this);
         archIndex = new ArchIndex(this);
     }
