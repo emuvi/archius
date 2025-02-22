@@ -71,8 +71,9 @@ public class ArchIndex implements Closeable {
     public void close() throws IOException {
         synchronized (indexMap) {
             for (var indexDataRoot : indexMap.keySet()) {
-                indexMap.remove(indexDataRoot).close();
+                indexMap.get(indexDataRoot).close();
             }
+            indexMap.clear();
         }
     }
 
