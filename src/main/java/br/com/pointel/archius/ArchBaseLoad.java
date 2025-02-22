@@ -199,7 +199,8 @@ public class ArchBaseLoad {
                         this.statusNumberOfVerified.incrementAndGet();
                     }
                 }
-                if (baseFile == null || !Objects.equals(baseFile.getIndexed(), file.lastModified())) {
+                var indexed = archBase.getIndexed(file);
+                if (baseFile == null || indexed == null || !Objects.equals(indexed, file.lastModified())) {
                     filesToIndex.addLast(file);
                     this.statusProgressMax.incrementAndGet();
                 }

@@ -26,8 +26,8 @@ public class ArchBase implements Closeable {
         this.rootLength = this.root.getAbsolutePath().length();
         this.listeners = new ArrayList<>();
         baseData = new ArchBaseData(root);
+        archIndex = new ArchIndex(root);
         baseLoad = new ArchBaseLoad(this);
-        archIndex = new ArchIndex(this);
     }
 
     public File getRoot() {
@@ -89,19 +89,19 @@ public class ArchBase implements Closeable {
         return baseLoad.getStatusNumberOfErros();
     }
 
-    public boolean isInRoot(File path) {
-        return path.getAbsolutePath().startsWith(root.getAbsolutePath());
+    public boolean isInRoot(File file) {
+        return file.getAbsolutePath().startsWith(root.getAbsolutePath());
     }
 
-    public String getPlace(File path) throws Exception {
-        if (!isInRoot(path)) {
+    public String getPlace(File file) throws Exception {
+        if (!isInRoot(file)) {
             throw new Exception("The file is not in the root.");
         }
-        return path.getAbsolutePath().substring(this.rootLength);
+        return file.getAbsolutePath().substring(this.rootLength);
     }
     
-    public String getPlaceFolder(File path) throws Exception {
-        var place = getPlace(path);
+    public String getPlaceFolder(File file) throws Exception {
+        var place = getPlace(file);
         return place.substring(0, place.lastIndexOf(File.separator) + 1);
     }
 
@@ -109,8 +109,8 @@ public class ArchBase implements Closeable {
         return baseData.getByPlace(place);
     }
 
-    public ArchBaseUnit getByPlace(File path) throws Exception {
-        return baseData.getByPlace(getPlace(path));
+    public ArchBaseUnit getByPlace(File file) throws Exception {
+        return baseData.getByPlace(getPlace(file));
     }
 
     public List<ArchBaseUnit> getByVerifier(String verifier) throws Exception {
@@ -129,36 +129,24 @@ public class ArchBase implements Closeable {
         baseData.putFile(place, verifier, modified);
     }
 
-    public void putFile(File path, String verifier) throws Exception {
-        baseData.putFile(getPlace(path), verifier, path.lastModified());
-    }
-    
-    public void putIndexed(String place, Long indexed) throws Exception {
-        baseData.putIndexed(place, indexed);
-    }
-
-    public void putIndexed(File path, Long indexed) throws Exception {
-        baseData.putIndexed(getPlace(path), indexed);
-    }
-
-    public void putIndexed(File path) throws Exception {
-        baseData.putIndexed(getPlace(path), path.lastModified());
+    public void putFile(File file, String verifier) throws Exception {
+        baseData.putFile(getPlace(file), verifier, file.lastModified());
     }
 
     public void delFolder(String place) throws Exception {
         baseData.delFolder(place);
     }
     
-    public void delFolder(File path) throws Exception {
-        baseData.delFolder(getPlace(path));
+    public void delFolder(File file) throws Exception {
+        baseData.delFolder(getPlace(file));
     }
 
     public void delFile(String place) throws Exception {
         baseData.delFile(place);
     }
     
-    public void delFile(File path) throws Exception {
-        baseData.delFile(getPlace(path));
+    public void delFile(File file) throws Exception {
+        baseData.delFile(getPlace(file));
     }
 
     public void moveFolder(String fromPlace, String toPlace) throws Exception {
@@ -177,17 +165,20 @@ public class ArchBase implements Closeable {
         baseData.moveFile(getPlace(fromPath), getPlace(toPath));
     }
 
+    public Long getIndexed(File path) throws Exception {
+        return archIndex.getIndexed(path);
+    }
+
     public void makeIndex(File path) throws Exception {
         archIndex.makeIndex(path);
-        putIndexed(path);
     }
 
     public void delIndex(File path) throws Exception {
         archIndex.delIndex(path);
     }
 
-    public List<File> searchFor(String words) throws Exception {
-        return archIndex.searchFor(words);
+    public void searchFor(String words, Consumer<File> consumer) throws Exception {
+        archIndex.searchFor(words, consumer);
     }
 
     @Override

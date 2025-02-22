@@ -20,7 +20,7 @@ public class ArchBaseData implements Closeable {
 
     public ArchBaseUnit getByPlace(String place) throws Exception {
         var select = this.connection.prepareStatement(
-                        "SELECT place, verifier, modified, indexed FROM files "
+                        "SELECT place, verifier, modified FROM files "
                                         + "WHERE place = ?");
         select.setString(1, place);
         var returned = select.executeQuery();
@@ -28,8 +28,7 @@ public class ArchBaseData implements Closeable {
             return new ArchBaseUnit(
                             returned.getString("place"),
                             returned.getString("verifier"),
-                            returned.getLong("modified"),
-                            returned.getLong("indexed"));
+                            returned.getLong("modified"));
         } else {
             return null;
         }
@@ -37,7 +36,7 @@ public class ArchBaseData implements Closeable {
 
     public List<ArchBaseUnit> getByVerifier(String verifier) throws Exception {
         var select = this.connection.prepareStatement(
-                        "SELECT place, verifier, modified, indexed FROM files "
+                        "SELECT place, verifier, modified FROM files "
                                         + "WHERE verifier = ?");
         select.setString(1, verifier);
         var returned = select.executeQuery();
@@ -46,23 +45,21 @@ public class ArchBaseData implements Closeable {
             results.add(new ArchBaseUnit(
                             returned.getString("place"),
                             returned.getString("verifier"),
-                            returned.getLong("modified"),
-                            returned.getLong("indexed")));
+                            returned.getLong("modified")));
         }
         return results;
     }
 
     public List<ArchBaseUnit> getAll() throws Exception {
         var select = this.connection.prepareStatement(
-                        "SELECT place, verifier, modified, indexed FROM files");
+                        "SELECT place, verifier, modified FROM files");
         var returned = select.executeQuery();
         var results = new ArrayList<ArchBaseUnit>();
         while (returned.next()) {
             results.add(new ArchBaseUnit(
                             returned.getString("place"),
                             returned.getString("verifier"),
-                            returned.getLong("modified"),
-                            returned.getLong("indexed")));
+                            returned.getLong("modified")));
         }
         return results;
     }
@@ -92,18 +89,6 @@ public class ArchBaseData implements Closeable {
         var results = insert.executeUpdate();
         if (results == 0) {
             throw new Exception("Could not put the file.");
-        }
-    }
-
-    public void putIndexed(String place, Long indexed) throws Exception {
-        var update = this.connection.prepareStatement(
-                        "UPDATE files SET indexed = ? WHERE place = ?");
-        update.setLong(1, indexed);
-        update.setString(2, place);
-        update.executeUpdate();
-        var results = update.executeUpdate();
-        if (results == 0) {
-            throw new Exception("Could not put the indexed.");
         }
     }
 
@@ -149,7 +134,7 @@ public class ArchBaseData implements Closeable {
         this.connection.createStatement().execute(
                         "CREATE TABLE IF NOT EXISTS "
                                         + "files (place TEXT PRIMARY KEY, "
-                                        + "verifier TEXT, modified INTEGER, indexed INTEGER)");
+                                        + "verifier TEXT, modified INTEGER)");
         this.connection.createStatement().execute(
                         "CREATE INDEX IF NOT EXISTS "
                                         + "files_verifier ON files (verifier)");

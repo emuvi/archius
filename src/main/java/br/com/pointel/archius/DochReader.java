@@ -24,7 +24,7 @@ public class DochReader {
         } else if (DochReaderTXT.canRead(file)) {
             return new DochReaderTXT(file).read();
         } else {
-            throw new Exception("Can not read this file type.");
+            return "";
         }
     }
 
