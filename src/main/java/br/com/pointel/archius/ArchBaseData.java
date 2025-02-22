@@ -97,6 +97,18 @@ public class ArchBaseData implements Closeable {
         }
     }
 
+    public void putIndexed(String place, Long indexed) throws Exception {
+        var update = this.connection.prepareStatement(
+                        "UPDATE files SET indexed = ? WHERE place = ?");
+        update.setLong(1, indexed);
+        update.setString(2, place);
+        update.executeUpdate();
+        var results = update.executeUpdate();
+        if (results == 0) {
+            throw new Exception("Could not put the indexed.");
+        }
+    }
+
     public void delFolder(String place) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE place LIKE ?");

@@ -12,16 +12,16 @@ import br.com.pointel.jarch.mage.WizBase;
 
 public class ArchBaseLoad {
 
-    private static final Integer DEFAULT_SPEED = 8;
-
     private final ArchBase archBase;
-    private final Integer speed;
+    private final Integer loadSpeed;
 
-    private final Deque<File> files;
+    private final Deque<File> filesToVerify;
+    private final Deque<File> filesToIndex;
 
     private final AtomicBoolean shouldStop;
     private final AtomicBoolean doneLoadFiles;
     private final AtomicInteger doneLoadVerifiers;
+    private final AtomicInteger doneLoadIndexes;
     private final AtomicBoolean doneLinterClean;
 
     private final AtomicInteger statusProgressPos;
@@ -30,27 +30,31 @@ public class ArchBaseLoad {
     private final AtomicInteger statusNumberOfFiles;
     private final AtomicInteger statusNumberOfChecked;
     private final AtomicInteger statusNumberOfVerified;
+    private final AtomicInteger statusNumberOfIndexed;
     private final AtomicInteger statusNumberOfLinted;
     private final AtomicInteger statusNumberOfCleaned;
     private final AtomicInteger statusNumberOfErros;
 
     public ArchBaseLoad(ArchBase archBase) throws Exception {
-        this(archBase, DEFAULT_SPEED);
+        this(archBase, Archius.DEFAULT_SPEED);
     }
 
-    public ArchBaseLoad(ArchBase archBase, Integer speed) throws Exception {
+    public ArchBaseLoad(ArchBase archBase, Integer loadSpeed) throws Exception {
         this.archBase = archBase;
-        this.speed = speed;
-        this.files = new ConcurrentLinkedDeque<>();
+        this.loadSpeed = loadSpeed;
+        this.filesToVerify = new ConcurrentLinkedDeque<>();
+        this.filesToIndex = new ConcurrentLinkedDeque<>();
         this.shouldStop = new AtomicBoolean(false);
         this.doneLoadFiles = new AtomicBoolean(false);
         this.doneLoadVerifiers = new AtomicInteger(0);
+        this.doneLoadIndexes = new AtomicInteger(0);
         this.doneLinterClean = new AtomicBoolean(false);
         this.statusProgressPos = new AtomicInteger(0);
         this.statusProgressMax = new AtomicInteger(0);
         this.statusNumberOfFiles = new AtomicInteger(0);
         this.statusNumberOfChecked = new AtomicInteger(0);
         this.statusNumberOfVerified = new AtomicInteger(0);
+        this.statusNumberOfIndexed = new AtomicInteger(0);
         this.statusNumberOfLinted = new AtomicInteger(0);
         this.statusNumberOfCleaned = new AtomicInteger(0);
         this.statusNumberOfErros = new AtomicInteger(0);
@@ -64,12 +68,21 @@ public class ArchBaseLoad {
                 doneLoadFiles.set(true);
             }
         }.start();
-        for (int i = 1; i <= speed; i++) {
+        for (int i = 1; i <= loadSpeed; i++) {
             new Thread("ArchBaseLoad - Verifier " + i) {
                 @Override
                 public void run() {
                     loadVerifiers();
                     doneLoadVerifiers.incrementAndGet();
+                }
+            }.start();
+        }
+        for (int i = 1; i <= loadSpeed; i++) {
+            new Thread("ArchBaseLoad - Index " + i) {
+                @Override
+                public void run() {
+                    loadIndexes();
+                    doneLoadIndexes.incrementAndGet();
                 }
             }.start();
         }
@@ -92,12 +105,17 @@ public class ArchBaseLoad {
 
     public Boolean isDone() {
         return doneLoadFiles.get()
-                && isDoneVerifiers()
-                && doneLinterClean.get();
+                        && isDoneVerifiers()
+                        && isDoneIndexes()
+                        && doneLinterClean.get();
     }
 
     private boolean isDoneVerifiers() {
-        return doneLoadVerifiers.get() == speed;
+        return doneLoadVerifiers.get() == loadSpeed;
+    }
+
+    private boolean isDoneIndexes() {
+        return doneLoadVerifiers.get() == loadSpeed;
     }
 
     public Double getProgress() {
@@ -122,6 +140,10 @@ public class ArchBaseLoad {
         return statusNumberOfVerified.get();
     }
 
+    public Integer getStatusNumberOfIndexed() {
+        return statusNumberOfIndexed.get();
+    }
+
     public Integer getStatusNumberOfLinted() {
         return statusNumberOfLinted.get();
     }
@@ -139,8 +161,8 @@ public class ArchBaseLoad {
             return;
         }
         if (path.isFile()) {
-            if (!(path.getName().startsWith("arch") && path.getName().endsWith(".sdb"))) {
-                files.addLast(path);
+            if (!(path.getName().startsWith("arch-") && path.getName().endsWith(".sdb"))) {
+                filesToVerify.addLast(path);
                 this.statusProgressMax.incrementAndGet();
                 this.statusNumberOfFiles.incrementAndGet();
             }
@@ -156,7 +178,7 @@ public class ArchBaseLoad {
             if (shouldStop.get()) {
                 break;
             }
-            var file = files.pollFirst();
+            var file = filesToVerify.pollFirst();
             if (file == null) {
                 if (doneLoadFiles.get()) {
                     break;
@@ -169,15 +191,49 @@ public class ArchBaseLoad {
                 archBase.sendToListeners("Checking: " + file.getName());
                 var place = archBase.getPlace(file);
                 var baseFile = archBase.getByPlace(place);
-                if (baseFile == null || !Objects.equals(file.length(), baseFile.getModified())) {
+                if (baseFile == null || !Objects.equals(baseFile.getModified(), file.lastModified())) {
                     try (FileInputStream input = new FileInputStream(file)) {
                         var verifier = DigestUtils.sha256Hex(input);
-                        archBase.putFile(place, verifier, file.length());
-                        archBase.sendToListeners("Putted: " + file.getName());
+                        archBase.putFile(place, verifier, file.lastModified());
+                        archBase.sendToListeners("Verified: " + file.getName());
                         this.statusNumberOfVerified.incrementAndGet();
                     }
                 }
+                if (baseFile == null || !Objects.equals(baseFile.getIndexed(), file.lastModified())) {
+                    filesToIndex.addLast(file);
+                    this.statusProgressMax.incrementAndGet();
+                }
+                archBase.sendToListeners("Checked: " + file.getName());
                 this.statusNumberOfChecked.incrementAndGet();
+            } catch (Exception e) {
+                e.printStackTrace();
+                archBase.sendToListeners("Error: " + e.getMessage());
+                statusNumberOfErros.incrementAndGet();
+            } finally {
+                this.statusProgressPos.incrementAndGet();
+            }
+        }
+    }
+
+    private void loadIndexes() {
+        while (true) {
+            if (shouldStop.get()) {
+                break;
+            }
+            var file = filesToIndex.pollFirst();
+            if (file == null) {
+                if (doneLoadFiles.get() && isDoneVerifiers()) {
+                    break;
+                } else {
+                    WizBase.sleep(100);
+                    continue;
+                }
+            }
+            try {
+                archBase.sendToListeners("Indexing: " + file.getName());
+                archBase.makeIndex(file);
+                archBase.sendToListeners("Indexed: " + file.getName());
+                this.statusNumberOfIndexed.incrementAndGet();
             } catch (Exception e) {
                 e.printStackTrace();
                 archBase.sendToListeners("Error: " + e.getMessage());
@@ -208,6 +264,8 @@ public class ArchBaseLoad {
                     if (!file.exists()) {
                         archBase.sendToListeners("Cleaning: " + place);
                         archBase.delFile(place);
+                        archBase.delIndex(file);
+                        archBase.sendToListeners("Cleaned: " + place);
                         statusNumberOfCleaned.incrementAndGet();
                     }
                 } catch (Exception e) {

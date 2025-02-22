@@ -16,6 +16,7 @@ public class ArchBase implements Closeable {
 
     private final ArchBaseData baseData;
     private final ArchBaseLoad baseLoad;
+    private final ArchIndex archIndex;
 
     public ArchBase(File root) throws Exception {
         if (!root.exists() || !root.isDirectory()) {
@@ -26,6 +27,7 @@ public class ArchBase implements Closeable {
         this.listeners = new ArrayList<>();
         baseData = new ArchBaseData(this);
         baseLoad = new ArchBaseLoad(this);
+        archIndex = new ArchIndex(this);
     }
 
     public File getRoot() {
@@ -69,6 +71,10 @@ public class ArchBase implements Closeable {
 
     public Integer getStatusNumberOfVerified() {
         return baseLoad.getStatusNumberOfVerified();
+    }
+
+    public Integer getStatusNumberOfIndexed() {
+        return baseLoad.getStatusNumberOfIndexed();
     }
 
     public Integer getStatusNumberOfLinted() {
@@ -124,7 +130,19 @@ public class ArchBase implements Closeable {
     }
 
     public void putFile(File path, String verifier) throws Exception {
-        baseData.putFile(getPlace(path), verifier, path.length());
+        baseData.putFile(getPlace(path), verifier, path.lastModified());
+    }
+    
+    public void putIndexed(String place, Long indexed) throws Exception {
+        baseData.putIndexed(place, indexed);
+    }
+
+    public void putIndexed(File path, Long indexed) throws Exception {
+        baseData.putIndexed(getPlace(path), indexed);
+    }
+
+    public void putIndexed(File path) throws Exception {
+        baseData.putIndexed(getPlace(path), path.lastModified());
     }
 
     public void delFolder(String place) throws Exception {
@@ -159,7 +177,18 @@ public class ArchBase implements Closeable {
         baseData.moveFile(getPlace(fromPath), getPlace(toPath));
     }
 
+    public void makeIndex(File path) throws Exception {
+        archIndex.makeIndex(path);
+        putIndexed(path);
+    }
 
+    public void delIndex(File path) throws Exception {
+        archIndex.delIndex(path);
+    }
+
+    public List<File> searchFor(String words) throws Exception {
+        return archIndex.searchFor(words);
+    }
 
     @Override
     public void close() throws IOException {
