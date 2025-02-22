@@ -11,13 +11,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 public class ArchBase implements Closeable {
 
-    public final File root;
+    private final File root;
     private final int rootLength;
     
     private final List<Consumer<String>> listeners;
 
-    public final ArchBaseData baseData;
-    public final ArchBaseLoad baseLoad;
+    private final ArchBaseData baseData;
+    private final ArchBaseLoad baseLoad;
 
     public ArchBase(File root) throws Exception {
         if (!root.exists() || !root.isDirectory()) {
@@ -28,6 +28,18 @@ public class ArchBase implements Closeable {
         this.listeners = new ArrayList<>();
         this.baseData = new ArchBaseData(this);
         this.baseLoad = new ArchBaseLoad(this);
+    }
+
+    public File getRoot() {
+        return root;
+    }
+
+    public ArchBaseData getBaseData() {
+        return baseData;
+    }
+
+    public ArchBaseLoad getBaseLoad() {
+        return baseLoad;
     }
     
     public void addListener(Consumer<String> listener) {
@@ -109,7 +121,7 @@ public class ArchBase implements Closeable {
             } else {
                 for (var archFile : archFiles) {
                     report.append("Is in the base as: ");
-                    report.append(archFile.place);
+                    report.append(archFile.getPlace());
                     report.append("\n");
                 }
             }

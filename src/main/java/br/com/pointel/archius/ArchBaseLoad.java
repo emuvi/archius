@@ -58,7 +58,7 @@ public class ArchBaseLoad {
         new Thread("ArchBaseLoad - Files") {
             @Override
             public void run() {
-                loadFiles(archBase.root);
+                loadFiles(archBase.getRoot());
                 doneLoadFiles.set(true);
             }
         }.start();
@@ -140,11 +140,11 @@ public class ArchBaseLoad {
             try {
                 archBase.sendToListeners("Checking: " + file.getName());
                 var place = archBase.getPlace(file);
-                var baseFile = archBase.baseData.getByPlace(place);
-                if (baseFile == null || !Objects.equals(file.length(), baseFile.modified)) {
+                var baseFile = archBase.getBaseData().getByPlace(place);
+                if (baseFile == null || !Objects.equals(file.length(), baseFile.getModified())) {
                     try (FileInputStream input = new FileInputStream(file)) {
                         var verifier = DigestUtils.sha256Hex(input);
-                        archBase.baseData.putFile(place, file.length(), verifier);
+                        archBase.getBaseData().putFile(place, file.length(), verifier);
                         archBase.sendToListeners("Putted: " + file.getName());
                         this.statusNumberOfVerified.incrementAndGet();
                     }
@@ -168,17 +168,17 @@ public class ArchBaseLoad {
                     return;
                 }
             }
-            var places = archBase.baseData.getAllPlaces();
+            var places = archBase.getBaseData().getAllPlaces();
             statusProgressMax.addAndGet(places.size());
             for (var place : places) {
                 if (this.shouldStop.get()) {
                     return;
                 }
                 try {
-                    var file = new File(archBase.root, place);
+                    var file = new File(archBase.getRoot(), place);
                     if (!file.exists()) {
                         archBase.sendToListeners("Cleaning: " + place);
-                        archBase.baseData.delFile(place);
+                        archBase.getBaseData().delFile(place);
                         statusNumberOfCleaned.incrementAndGet();
                     }
                 } catch (Exception e) {
