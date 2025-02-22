@@ -1,4 +1,4 @@
-package br.com.pointel.archius.desk;
+package br.com.pointel.archius;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;

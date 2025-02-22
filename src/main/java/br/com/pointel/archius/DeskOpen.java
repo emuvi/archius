@@ -1,4 +1,4 @@
-package br.com.pointel.archius.desk;
+package br.com.pointel.archius;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,7 +16,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.apache.commons.lang3.tuple.Pair;
-import br.com.pointel.archius.ArchBase;
 import br.com.pointel.jarch.mage.WizBase;
 import br.com.pointel.jarch.mage.WizChars;
 import br.com.pointel.jarch.mage.WizDesk;

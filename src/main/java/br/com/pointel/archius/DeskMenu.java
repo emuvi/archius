@@ -1,4 +1,4 @@
-package br.com.pointel.archius.desk;
+package br.com.pointel.archius;
 
 import java.io.File;
 import javax.swing.JCheckBoxMenuItem;
