@@ -6,7 +6,7 @@ import br.com.pointel.jarch.mage.WizArray;
 
 public class DochReaderTXTUtils {
 
-    public static String[] TXT_EXTENSIONS = new String[]{"txt", "md", "htm", "html", "log"};
+    public static String[] TXT_EXTENSIONS = new String[]{"txt", "md", "htm", "html", "php", "phtml", "java", "py", "log"};
 
     public static boolean isTXTFile(File file) {
         return isTXTFile(file.getName());

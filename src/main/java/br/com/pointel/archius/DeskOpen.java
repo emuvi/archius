@@ -131,7 +131,7 @@ public class DeskOpen extends JFrame {
                         archBase.getBaseLoad().getStatusNumberOfCleaned().toString()));
         grid.add(Pair.of("Number Of Erros",
                         archBase.getBaseLoad().getStatusNumberOfErros().toString()));
-        var status = WizChars.mountGrid(grid) + "\n\nLast Status:\n" + lastStatus;
+        var status = WizChars.mountGrid(grid).trim() + "\n\nLast Status:\n" + lastStatus;
         return status;
     }
 
