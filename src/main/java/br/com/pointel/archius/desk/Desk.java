@@ -3,7 +3,6 @@ package br.com.pointel.archius.desk;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import br.com.pointel.jarch.mage.WizDesk;
-import br.com.pointel.jarch.mage.WizSwing;
 
 public class Desk extends JFrame {
     
@@ -23,8 +22,8 @@ public class Desk extends JFrame {
         setTitle("Archius");
         setLayout(new BorderLayout());
         add(deskIcon, BorderLayout.CENTER);
-        WizSwing.initFrame(this);
-        WizSwing.initEscaper(this);
+        WizDesk.initFrame(this);
+        WizDesk.initEscaper(this);
     }
 
     public void actMenu() {

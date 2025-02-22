@@ -1,31 +1,35 @@
 package br.com.pointel.archius.desk;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import br.com.pointel.jarch.mage.WizSwing;
+import br.com.pointel.jarch.mage.WizDesk;
 
 public class DeskMenu extends JPopupMenu {
 
     private final Desk desk;
     
-    private final JMenuItem menuResize = new JMenuItem("Resize");
+    private final JMenu menuResize = new JMenu("Resize");
+    private final JMenuItem menuResize32 = new JMenuItem("32");
+    private final JMenuItem menuResize64 = new JMenuItem("64");
+    private final JMenuItem menuResize128 = new JMenuItem("128");
+    private final JMenuItem menuResize256 = new JMenuItem("256");
     private final JCheckBoxMenuItem menuOnTop = new JCheckBoxMenuItem("OnTop");
     private final JMenuItem menuExit = new JMenuItem("Exit");
     
     public DeskMenu(Desk desk) {
         this.desk = desk;
         initPopupListener();
+        initMenuItems();
     }
     
     private void initPopupListener() {
         addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                menuClean();
-                menuPutEnding();
                 menuOnTop.setSelected(desk.isAlwaysOnTop());
             }
             
@@ -39,24 +43,14 @@ public class DeskMenu extends JPopupMenu {
         });
     }
     
-    private void menuClean() {
-        removeAll();
-    }
-    
-    private void menuPutEnding() {
-        this.addSeparator();
-        WizSwing.addMenuItem(this, menuResize, e -> callResize());
-        WizSwing.addMenuItem(this, menuOnTop, e -> callOnTop());
-        WizSwing.addMenuItem(this, menuExit, e -> callExit());
-    }
-    
-    private void callResize() {
-        switch (desk.getWidth()) {
-            case 64 -> desk.setSize(128, 128);
-            case 128 -> desk.setSize(192, 192);
-            case 192 -> desk.setSize(256, 256);
-            default -> desk.setSize(64, 64);
-        }
+    private void initMenuItems() {
+        WizDesk.addMenu(this, menuResize);
+        WizDesk.addMenu(menuResize, menuResize32, e -> desk.setSize(32, 32));
+        WizDesk.addMenu(menuResize, menuResize64, e -> desk.setSize(64, 64));
+        WizDesk.addMenu(menuResize, menuResize128, e -> desk.setSize(128, 128));
+        WizDesk.addMenu(menuResize, menuResize256, e -> desk.setSize(256, 256));
+        WizDesk.addMenu(this, menuOnTop, e -> callOnTop());
+        WizDesk.addMenu(this, menuExit, e -> callExit());
     }
     
     private void callOnTop() {
@@ -65,7 +59,7 @@ public class DeskMenu extends JPopupMenu {
     }
     
     private void callExit() {
-        WizSwing.closeAll();
+        WizDesk.closeAll();
     }
 
 }
