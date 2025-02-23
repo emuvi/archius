@@ -13,13 +13,13 @@ public class ArchIndexData implements Closeable {
 
     private final Connection connection;
 
-    public ArchIndexData(File root) throws Exception {
+    public ArchIndexData(File folder) throws Exception {
         this.connection = DriverManager.getConnection("jdbc:sqlite:"
-                        + new File(root, "arch-index.sdb").getAbsolutePath());
+                        + new File(folder, "arch-index.sdb").getAbsolutePath());
         this.initDatabase();
     }
 
-    public ArchIndexUnit getByName(String name) throws Exception {
+    public synchronized ArchIndexUnit getByName(String name) throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT name, words, indexed FROM files "
                                         + "WHERE name = ?");
@@ -35,7 +35,7 @@ public class ArchIndexData implements Closeable {
         }
     }
 
-    public Long getIndexedByName(String name) throws Exception {
+    public synchronized Long getIndexedByName(String name) throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT indexed FROM files WHERE name = ?");
         select.setString(1, name);
@@ -47,7 +47,19 @@ public class ArchIndexData implements Closeable {
         }
     }
 
-    public List<ArchIndexUnit> getAll() throws Exception {
+    public synchronized String getWordsByName(String name) throws Exception {
+        var select = this.connection.prepareStatement(
+                        "SELECT words FROM files WHERE name = ?");
+        select.setString(1, name);
+        var returned = select.executeQuery();
+        if (returned.next()) {
+            return returned.getString("words");
+        } else {
+            return null;
+        }
+    }
+
+    public synchronized List<ArchIndexUnit> getAll() throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT name, words, indexed FROM files");
         var returned = select.executeQuery();
@@ -61,7 +73,7 @@ public class ArchIndexData implements Closeable {
         return results;
     }
 
-    public List<Pair<String, Long>> getAllIndexed() throws Exception {
+    public synchronized List<Pair<String, Long>> getAllIndexed() throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT name, indexed FROM files");
         var returned = select.executeQuery();
@@ -74,7 +86,7 @@ public class ArchIndexData implements Closeable {
         return results;
     }
 
-    public void putFile(String name, String words, Long indexed) throws Exception {
+    public synchronized void putFile(String name, String words, Long indexed) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE name = ?");
         delete.setString(1, name);
@@ -91,7 +103,7 @@ public class ArchIndexData implements Closeable {
         }
     }
 
-    public void delFile(String name) throws Exception {
+    public synchronized void delFile(String name) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE name = ?");
         delete.setString(1, name);
@@ -106,7 +118,7 @@ public class ArchIndexData implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         try {
             this.connection.close();
         } catch (Exception e) {

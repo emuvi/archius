@@ -85,8 +85,8 @@ public class ArchBase implements Closeable {
         return baseLoad.getStatusNumberOfCleaned();
     }
 
-    public Integer getStatusNumberOfErros() {
-        return baseLoad.getStatusNumberOfErros();
+    public Integer getStatusNumberOfErrors() {
+        return baseLoad.getStatusNumberOfErrors();
     }
 
     public boolean isInRoot(File file) {
@@ -177,13 +177,13 @@ public class ArchBase implements Closeable {
         archIndex.delIndex(path);
     }
 
-    public void searchFor(String words, Consumer<File> consumer) throws Exception {
-        archIndex.searchFor(words, consumer);
+    public ArchSearch searchFor(String words) {
+        return archIndex.searchFor(words);
     }
 
     @Override
     public void close() throws IOException {
-        baseLoad.stop();
+        baseLoad.stopAndWait();
         baseData.close();
         archIndex.close();
     }

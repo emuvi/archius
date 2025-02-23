@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import br.com.pointel.jarch.mage.WizChars;
 
 public class ArchIndex implements Closeable {
@@ -18,6 +17,10 @@ public class ArchIndex implements Closeable {
         this.indexMap = new HashMap<>();
     }
 
+    public File getRoot() {
+        return root;
+    }
+
     public boolean isInRoot(File file) {
         return file.getAbsolutePath().startsWith(root.getAbsolutePath());
     }
@@ -26,8 +29,8 @@ public class ArchIndex implements Closeable {
         if (!isInRoot(file)) {
             throw new Exception("The file is not in the root.");
         }
-        var root = file.getParentFile();
-        var indexData = getIndexData(root);
+        var folder = file.getParentFile();
+        var indexData = getIndexData(folder);
         return indexData.getIndexedByName(file.getName());
     }
 
@@ -35,8 +38,8 @@ public class ArchIndex implements Closeable {
         if (!isInRoot(file)) {
             throw new Exception("The file is not in the root.");
         }
-        var root = file.getParentFile();
-        var indexData = getIndexData(root);
+        var folder = file.getParentFile();
+        var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
         var words = "|" + String.join("|", WizChars.getWords(source)) + "|";
         indexData.putFile(file.getName(), words, file.lastModified());
@@ -46,22 +49,22 @@ public class ArchIndex implements Closeable {
         if (!isInRoot(file)) {
             throw new Exception("The file is not in the root.");
         }
-        var root = file.getParentFile();
-        var indexData = getIndexData(root);
+        var folder = file.getParentFile();
+        var indexData = getIndexData(folder);
         indexData.delFile(file.getName());
     }
 
-    public void searchFor(String words, Consumer<File> consumer) throws Exception {
-        
+    public ArchSearch searchFor(String words) {
+        return new ArchSearch(this, words).start();
     }
 
-    private ArchIndexData getIndexData(File root) throws Exception {
+    public ArchIndexData getIndexData(File folder) throws Exception {
         synchronized (indexMap) {
-            if (indexMap.containsKey(root)) {
-                return indexMap.get(root);
+            if (indexMap.containsKey(folder)) {
+                return indexMap.get(folder);
             } else {
-                var indexData = new ArchIndexData(root);
-                indexMap.put(root, indexData);
+                var indexData = new ArchIndexData(folder);
+                indexMap.put(folder, indexData);
                 return indexData;
             }
         }

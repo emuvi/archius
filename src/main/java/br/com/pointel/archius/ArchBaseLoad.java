@@ -33,7 +33,7 @@ public class ArchBaseLoad {
     private final AtomicInteger statusNumberOfIndexed;
     private final AtomicInteger statusNumberOfLinted;
     private final AtomicInteger statusNumberOfCleaned;
-    private final AtomicInteger statusNumberOfErros;
+    private final AtomicInteger statusNumberOfErrors;
 
     public ArchBaseLoad(ArchBase archBase) throws Exception {
         this(archBase, Archius.DEFAULT_SPEED);
@@ -57,7 +57,7 @@ public class ArchBaseLoad {
         this.statusNumberOfIndexed = new AtomicInteger(0);
         this.statusNumberOfLinted = new AtomicInteger(0);
         this.statusNumberOfCleaned = new AtomicInteger(0);
-        this.statusNumberOfErros = new AtomicInteger(0);
+        this.statusNumberOfErrors = new AtomicInteger(0);
     }
 
     public ArchBaseLoad start() {
@@ -98,6 +98,10 @@ public class ArchBaseLoad {
 
     public void stop() {
         shouldStop.set(true);
+    }
+
+    public void stopAndWait() {
+        stop();
         while (!isDone()) {
             WizBase.sleep(10);
         }
@@ -152,8 +156,8 @@ public class ArchBaseLoad {
         return statusNumberOfCleaned.get();
     }
 
-    public Integer getStatusNumberOfErros() {
-        return statusNumberOfErros.get();
+    public Integer getStatusNumberOfErrors() {
+        return statusNumberOfErrors.get();
     }
 
     private void loadFiles(File path) {
@@ -209,7 +213,7 @@ public class ArchBaseLoad {
             } catch (Exception e) {
                 e.printStackTrace();
                 archBase.sendToListeners("Error: " + e.getMessage());
-                statusNumberOfErros.incrementAndGet();
+                statusNumberOfErrors.incrementAndGet();
             } finally {
                 this.statusProgressPos.incrementAndGet();
             }
@@ -238,7 +242,7 @@ public class ArchBaseLoad {
             } catch (Exception e) {
                 e.printStackTrace();
                 archBase.sendToListeners("Error: " + e.getMessage());
-                statusNumberOfErros.incrementAndGet();
+                statusNumberOfErrors.incrementAndGet();
             } finally {
                 this.statusProgressPos.incrementAndGet();
             }
@@ -272,7 +276,7 @@ public class ArchBaseLoad {
                 } catch (Exception e) {
                     e.printStackTrace();
                     archBase.sendToListeners("Error: " + e.getMessage());
-                    statusNumberOfErros.incrementAndGet();
+                    statusNumberOfErrors.incrementAndGet();
                 } finally {
                     statusProgressPos.incrementAndGet();
                 }
@@ -280,7 +284,7 @@ public class ArchBaseLoad {
         } catch (Exception e) {
             e.printStackTrace();
             archBase.sendToListeners("Error: " + e.getMessage());
-            statusNumberOfErros.incrementAndGet();
+            statusNumberOfErrors.incrementAndGet();
         }
     }
 

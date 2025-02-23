@@ -18,7 +18,7 @@ public class ArchBaseData implements Closeable {
         this.initDatabase();
     }
 
-    public ArchBaseUnit getByPlace(String place) throws Exception {
+    public synchronized ArchBaseUnit getByPlace(String place) throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT place, verifier, modified FROM files "
                                         + "WHERE place = ?");
@@ -34,7 +34,7 @@ public class ArchBaseData implements Closeable {
         }
     }
 
-    public List<ArchBaseUnit> getByVerifier(String verifier) throws Exception {
+    public synchronized List<ArchBaseUnit> getByVerifier(String verifier) throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT place, verifier, modified FROM files "
                                         + "WHERE verifier = ?");
@@ -50,7 +50,7 @@ public class ArchBaseData implements Closeable {
         return results;
     }
 
-    public List<ArchBaseUnit> getAll() throws Exception {
+    public synchronized List<ArchBaseUnit> getAll() throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT place, verifier, modified FROM files");
         var returned = select.executeQuery();
@@ -64,7 +64,7 @@ public class ArchBaseData implements Closeable {
         return results;
     }
 
-    public List<String> getAllPlaces() throws Exception {
+    public synchronized List<String> getAllPlaces() throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT place FROM files");
         var returned = select.executeQuery();
@@ -75,7 +75,7 @@ public class ArchBaseData implements Closeable {
         return results;
     }
 
-    public void putFile(String place, String verifier, Long modified) throws Exception {
+    public synchronized void putFile(String place, String verifier, Long modified) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE place = ?");
         delete.setString(1, place);
@@ -92,21 +92,21 @@ public class ArchBaseData implements Closeable {
         }
     }
 
-    public void delFolder(String place) throws Exception {
+    public synchronized void delFolder(String place) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE place LIKE ?");
         delete.setString(1, place + "%");
         delete.executeUpdate();
     }
 
-    public void delFile(String place) throws Exception {
+    public synchronized void delFile(String place) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE place = ?");
         delete.setString(1, place);
         delete.executeUpdate();
     }
 
-    public void moveFolder(String fromPlace, String toPlace) throws Exception {
+    public synchronized void moveFolder(String fromPlace, String toPlace) throws Exception {
         var select = this.connection.prepareStatement(
                         "SELECT place FROM files WHERE place LIKE ?");
         select.setString(1, fromPlace + "%");
@@ -122,7 +122,7 @@ public class ArchBaseData implements Closeable {
         }
     }
 
-    public void moveFile(String fromPlace, String toPlace) throws Exception {
+    public synchronized void moveFile(String fromPlace, String toPlace) throws Exception {
         var update = this.connection.prepareStatement(
                         "UPDATE files SET place = ? WHERE place = ?");
         update.setString(1, toPlace);
@@ -141,7 +141,7 @@ public class ArchBaseData implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         try {
             this.connection.close();
         } catch (Exception e) {

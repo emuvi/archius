@@ -53,7 +53,9 @@ public class DeskOpen extends JFrame {
         panelBody.setLayout(new GridBagLayout());
         insertComponents();
         buttonSearch.setText("Search");
+        buttonSearch.addActionListener(e -> actSearch());
         buttonInsert.setText("Insert");
+        buttonInsert.addActionListener(e -> actInsert());
         scrollStatus.setViewportView(textStatus);
         textStatus.setLineWrap(true);
         textStatus.setWrapStyleWord(true);
@@ -99,8 +101,8 @@ public class DeskOpen extends JFrame {
     private void initUpdater() {
         new Thread(() -> {
             while (isDisplayable()) {
-                WizBase.sleep(500);
                 updateStatus();
+                WizBase.sleep(500);
             }
         }, "DeskOpen - Updater").start();
     }
@@ -136,10 +138,18 @@ public class DeskOpen extends JFrame {
                         archBase.getStatusNumberOfLinted().toString()));
         grid.add(Pair.of("Number Of Cleaned",
                         archBase.getStatusNumberOfCleaned().toString()));
-        grid.add(Pair.of("Number Of Erros",
-                        archBase.getStatusNumberOfErros().toString()));
+        grid.add(Pair.of("Number Of Errors",
+                        archBase.getStatusNumberOfErrors().toString()));
         var status = WizChars.mountGrid(grid).trim() + "\n\nLast Status:\n" + lastStatus;
         return status;
+    }
+
+    private void actSearch() {
+        new DeskSearch(archBase.searchFor(fieldSearch.getText())).setVisible(true);
+    }
+
+    private void actInsert() {
+
     }
 
 }
