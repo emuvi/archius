@@ -16,7 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import br.com.pointel.jarch.mage.WizDesk;
 
-public class DeskInsert extends JFrame {
+public class DeskCatalog extends JFrame {
 
     private final ArchBase archBase;
 
@@ -35,7 +35,7 @@ public class DeskInsert extends JFrame {
     private final JTextArea textSource = new JTextArea();
     private final JScrollPane scrollSource = new JScrollPane(textSource);
 
-    public DeskInsert(ArchBase archBase) {
+    public DeskCatalog(ArchBase archBase) {
         this.archBase = archBase;
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(DeskIcon.getLogo());

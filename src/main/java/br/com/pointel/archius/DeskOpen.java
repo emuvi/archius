@@ -26,10 +26,10 @@ public class DeskOpen extends JFrame {
 
     private final JPanel panelBody = new JPanel();
     private final JTextField fieldSearch = new JTextField();
-    private final JButton buttonSearch = new JButton();
-    private final JButton buttonInsert = new JButton();
-    private final JScrollPane scrollStatus = new JScrollPane();
+    private final JButton buttonSearch = new JButton("Search");
+    private final JButton buttonCatalog = new JButton("Catalog");
     private final JTextArea textStatus = new JTextArea();
+    private final JScrollPane scrollStatus = new JScrollPane(textStatus);
 
     private volatile String lastStatus = "";
 
@@ -52,11 +52,8 @@ public class DeskOpen extends JFrame {
         panelBody.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         panelBody.setLayout(new GridBagLayout());
         insertComponents();
-        buttonSearch.setText("Search");
         buttonSearch.addActionListener(e -> actSearch());
-        buttonInsert.setText("Insert");
-        buttonInsert.addActionListener(e -> actInsert());
-        scrollStatus.setViewportView(textStatus);
+        buttonCatalog.addActionListener(e -> actInsert());
         textStatus.setLineWrap(true);
         textStatus.setWrapStyleWord(true);
         addWindowListener(new WindowAdapter() {
@@ -78,17 +75,25 @@ public class DeskOpen extends JFrame {
         constraints.insets = new Insets(2, 2, 2, 2);
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.gridwidth = 1;
         constraints.weightx = 1;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.BOTH;
         panelBody.add(fieldSearch, constraints);
         constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
         constraints.weightx = 0;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.NONE;
         panelBody.add(buttonSearch, constraints);
         constraints.gridx = 2;
-        panelBody.add(buttonInsert, constraints);
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.NONE;
+        panelBody.add(buttonCatalog, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = 3;
@@ -149,7 +154,7 @@ public class DeskOpen extends JFrame {
     }
 
     private void actInsert() {
-        new DeskInsert(archBase).setVisible(true);
+        new DeskCatalog(archBase).setVisible(true);
     }
 
 }
