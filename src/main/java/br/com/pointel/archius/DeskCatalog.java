@@ -1,47 +1,52 @@
 package br.com.pointel.archius;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import br.com.pointel.jarch.mage.WizDesk;
 
 public class DeskCatalog extends JFrame {
 
     private final ArchBase archBase;
 
-    private final JPanel panelBody = new JPanel();
+    private final JPanel panelBody = new JPanel(new BorderLayout(4, 4));
 
-    private final JPanel panelShelf = new JPanel();
+    private final JPanel panelShelf = new JPanel(new GridBagLayout());
     private final JLabel labelShelf = new JLabel("Shelf");
-    private final DefaultComboBoxModel<File> modelShelf = new DefaultComboBoxModel<File>();
-    private final JComboBox<File> comboShelf = new JComboBox<>(modelShelf);
+    private final DeskCatalogShelves panelShelves;
+    private final JScrollPane scrollShelves;
     private final JButton buttonShelf = new JButton("*");
 
-    private final JPanel panelNaming = new JPanel();
-    private final JLabel labelNaming = new JLabel("Naming");
-    private final JTextField fieldName = new JTextField();
+    private final JPanel panelNaming = new JPanel(new GridBagLayout());
+    private final JLabel labelNaming = new JLabel("Name");
+    private final DeskCatalogNames panelNames = new DeskCatalogNames();
+    private final JScrollPane scrollNaming = new JScrollPane(panelNames);
+    private final JButton buttonNaming = new JButton("*");
 
     private final JTextArea textSource = new JTextArea();
     private final JScrollPane scrollSource = new JScrollPane(textSource);
 
+    private final JSplitPane splitNaming = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panelNaming, scrollSource);
+    private final JSplitPane splitShelf = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panelShelf, splitNaming);
+
     public DeskCatalog(ArchBase archBase) {
         this.archBase = archBase;
+        this.panelShelves = new DeskCatalogShelves(this);
+        this.scrollShelves = new JScrollPane(panelShelves);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(DeskIcon.getLogo());
         setSize(800, 600);
-        setName("search on " + archBase.getRoot().getName());
-        setTitle("Search on " + archBase.getRoot().getName());
+        setName("catalog on " + archBase.getRoot().getName());
+        setTitle("Catalog on " + archBase.getRoot().getName());
         WizDesk.initFrame(this);
         WizDesk.initEscaper(this);
         initComponents();
@@ -49,40 +54,11 @@ public class DeskCatalog extends JFrame {
 
     private void initComponents() {
         setContentPane(panelBody);
-        panelBody.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        panelBody.setLayout(new GridBagLayout());
-        panelShelf.setLayout(new GridBagLayout());
-        panelNaming.setLayout(new GridBagLayout());
-        insertComponentsBody();
+        panelBody.add(splitShelf, BorderLayout.CENTER);
         insertComponentsShelf();
         insertComponentsNaming();
-    }
-
-    private void insertComponentsBody() {
-        var constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(2, 2, 2, 2);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.weightx = 1;
-        constraints.weighty = 0;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        panelBody.add(panelShelf, constraints);
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.weightx = 2;
-        constraints.weighty = 0;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        panelBody.add(panelNaming, constraints);
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.gridwidth = 2;
-        constraints.fill = GridBagConstraints.BOTH;
-        panelBody.add(scrollSource, constraints);
+        splitNaming.setName("naming");
+        splitShelf.setName("shelf");
     }
 
     private void insertComponentsShelf() {
@@ -102,13 +78,14 @@ public class DeskCatalog extends JFrame {
         constraints.weighty = 1;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.BOTH;
-        panelShelf.add(comboShelf, constraints);
+        panelShelf.add(scrollShelves, constraints);
+        constraints.anchor = GridBagConstraints.SOUTHEAST;
         constraints.gridx = 1;
         constraints.gridy = 1;
         constraints.weightx = 0;
-        constraints.weighty = 1;
+        constraints.weighty = 0;
         constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.VERTICAL;
+        constraints.fill = GridBagConstraints.NONE;
         panelShelf.add(buttonShelf, constraints);
     }
 
@@ -129,7 +106,19 @@ public class DeskCatalog extends JFrame {
         constraints.weighty = 1;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.BOTH;
-        panelNaming.add(fieldName, constraints);
+        panelNaming.add(scrollNaming, constraints);
+        constraints.anchor = GridBagConstraints.SOUTHEAST;
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 0;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        panelNaming.add(buttonNaming, constraints);
+    }
+
+    public File getRoot() {
+        return archBase.getRoot();
     }
 
 }
