@@ -149,7 +149,7 @@ public class DeskOpen extends JFrame {
     }
 
     private void actInsert() {
-
+        new DeskInsert(archBase).setVisible(true);
     }
 
 }
