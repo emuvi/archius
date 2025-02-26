@@ -1,6 +1,8 @@
 package br.com.pointel.archius;
 
-public abstract class ConfigNamer {
+import java.io.Serializable;
+
+public abstract class ConfigNamer implements Serializable {
 
     private final ConfigNamerType type;
     private final String name;
@@ -20,8 +22,13 @@ public abstract class ConfigNamer {
         return this.name;
     }
 
-    public Boolean getRequired() {
+    public Boolean isRequired() {
         return this.required;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
 }

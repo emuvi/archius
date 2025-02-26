@@ -28,6 +28,7 @@ public class DeskOpen extends JFrame {
     private final JTextField fieldSearch = new JTextField();
     private final JButton buttonSearch = new JButton("Search");
     private final JButton buttonCatalog = new JButton("Catalog");
+    private final JButton buttonConfig = new JButton("*");
     private final JTextArea textStatus = new JTextArea();
     private final JScrollPane scrollStatus = new JScrollPane(textStatus);
 
@@ -54,6 +55,8 @@ public class DeskOpen extends JFrame {
         insertComponents();
         buttonSearch.addActionListener(e -> actSearch());
         buttonCatalog.addActionListener(e -> actInsert());
+        buttonConfig.addActionListener(e -> actConfig());
+        textStatus.setEditable(false);
         textStatus.setLineWrap(true);
         textStatus.setWrapStyleWord(true);
         addWindowListener(new WindowAdapter() {
@@ -94,9 +97,16 @@ public class DeskOpen extends JFrame {
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.NONE;
         panelBody.add(buttonCatalog, constraints);
+        constraints.gridx = 3;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.NONE;
+        panelBody.add(buttonConfig, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
-        constraints.gridwidth = 3;
+        constraints.gridwidth = 4;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -155,6 +165,10 @@ public class DeskOpen extends JFrame {
 
     private void actInsert() {
         new DeskCatalog(archBase).setVisible(true);
+    }
+
+    private void actConfig() {
+        new DeskConfig(archBase).setVisible(true);
     }
 
 }
