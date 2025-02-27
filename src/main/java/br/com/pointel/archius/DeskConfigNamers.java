@@ -53,7 +53,9 @@ public class DeskConfigNamers extends JPanel {
     }
 
     public void addNamer(ConfigNamer namer) {
-        modelNamers.add(listNamers.getSelectedIndex() + 1, namer);
+        var selected = listNamers.getSelectedIndex();
+        modelNamers.add(selected + 1, namer);
+        listNamers.setSelectedIndex(selected + 1);
     }
 
     private void initComponents() {

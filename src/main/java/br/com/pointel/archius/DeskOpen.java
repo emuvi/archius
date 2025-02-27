@@ -160,15 +160,27 @@ public class DeskOpen extends JFrame {
     }
 
     private void actSearch() {
-        new DeskSearch(archBase.searchFor(fieldSearch.getText())).setVisible(true);
+        try {
+            new DeskSearch(archBase.searchFor(fieldSearch.getText())).setVisible(true);
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
     }
 
     private void actInsert() {
-        new DeskCatalog(archBase).setVisible(true);
+        try {
+            new DeskCatalog(archBase).setVisible(true);
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
     }
 
     private void actConfig() {
-        new DeskConfig(archBase).setVisible(true);
+        try {
+            new DeskConfig(archBase).setVisible(true);
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
     }
 
 }

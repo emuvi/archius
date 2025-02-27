@@ -28,8 +28,8 @@ public class DeskCatalog extends JFrame {
 
     private final JPanel panelNaming = new JPanel(new GridBagLayout());
     private final JLabel labelNaming = new JLabel("Name");
-    private final DeskCatalogNames panelNames = new DeskCatalogNames();
-    private final JScrollPane scrollNaming = new JScrollPane(panelNames);
+    private final DeskCatalogNamers panelNames;
+    private final JScrollPane scrollNaming;
     private final JButton buttonNaming = new JButton("*");
 
     private final JTextArea textSource = new JTextArea();
@@ -38,10 +38,12 @@ public class DeskCatalog extends JFrame {
     private final JSplitPane splitNaming = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panelNaming, scrollSource);
     private final JSplitPane splitShelf = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panelShelf, splitNaming);
 
-    public DeskCatalog(ArchBase archBase) {
+    public DeskCatalog(ArchBase archBase) throws Exception {
         this.archBase = archBase;
         this.panelShelves = new DeskCatalogShelves(this);
         this.scrollShelves = new JScrollPane(panelShelves);
+        this.panelNames = new DeskCatalogNamers(Config.load(archBase.getRoot()).getNamers());
+        this.scrollNaming = new JScrollPane(panelNames);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(DeskIcon.getLogo());
         setSize(800, 600);
