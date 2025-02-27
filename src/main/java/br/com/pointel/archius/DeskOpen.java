@@ -54,7 +54,7 @@ public class DeskOpen extends JFrame {
         panelBody.setLayout(new GridBagLayout());
         insertComponents();
         buttonSearch.addActionListener(e -> actSearch());
-        buttonCatalog.addActionListener(e -> actInsert());
+        buttonCatalog.addActionListener(e -> actCatalog());
         buttonConfig.addActionListener(e -> actConfig());
         textStatus.setEditable(false);
         textStatus.setLineWrap(true);
@@ -167,9 +167,14 @@ public class DeskOpen extends JFrame {
         }
     }
 
-    private void actInsert() {
+    private void actCatalog() {
         try {
-            new DeskCatalog(archBase).setVisible(true);
+            var selected = WizDesk.selectFiles(null);
+            if (selected != null) {
+                for (var adding : selected) {
+                    new DeskCatalog(archBase, adding).setVisible(true);
+                }
+            }
         } catch (Exception e) {
             WizDesk.showError(e);
         }

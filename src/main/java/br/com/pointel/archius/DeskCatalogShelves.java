@@ -20,12 +20,12 @@ public class DeskCatalogShelves extends JPanel {
     public DeskCatalogShelves(DeskCatalog deskCatalog) {
         super(new WrapLayout(FlowLayout.LEFT, 4, 4));
         this.deskCatalog = deskCatalog;
-        select(deskCatalog.getRoot());
+        setShelf(deskCatalog.getRoot());
     }
 
     private Boolean selecting = false;
 
-    public void select(File folder) {
+    public void setShelf(File folder) {
         selecting = true;
         clear();
         var stack = getStack(folder);
@@ -56,7 +56,7 @@ public class DeskCatalogShelves extends JPanel {
         SwingUtilities.updateComponentTreeUI(this);
     }
 
-    public File getSelected() {
+    public File getShelf() {
         var result = deskCatalog.getRoot();
         for (var combo : listCombos) {
             var selected = (String) combo.getSelectedItem();
@@ -98,7 +98,7 @@ public class DeskCatalogShelves extends JPanel {
             return;
         }
         var actual = new File(onFolder, selected);
-        select(actual);
+        setShelf(actual);
     }
 
 }
