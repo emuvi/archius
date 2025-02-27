@@ -22,13 +22,13 @@ public class DeskCatalog extends JFrame {
 
     private final JPanel panelShelf = new JPanel(new GridBagLayout());
     private final JLabel labelShelf = new JLabel("Shelf");
-    private final DeskCatalogShelves panelShelves;
+    private final DeskCatalogShelves catalogShelves;
     private final JScrollPane scrollShelves;
     private final JButton buttonShelf = new JButton("*");
 
     private final JPanel panelNaming = new JPanel(new GridBagLayout());
     private final JLabel labelNaming = new JLabel("Name");
-    private final DeskCatalogNamers panelNames;
+    private final DeskCatalogNamers catalogNamers;
     private final JScrollPane scrollNaming;
     private final JButton buttonNaming = new JButton("*");
 
@@ -40,10 +40,10 @@ public class DeskCatalog extends JFrame {
 
     public DeskCatalog(ArchBase archBase) throws Exception {
         this.archBase = archBase;
-        this.panelShelves = new DeskCatalogShelves(this);
-        this.scrollShelves = new JScrollPane(panelShelves);
-        this.panelNames = new DeskCatalogNamers(Config.load(archBase.getRoot()).getNamers());
-        this.scrollNaming = new JScrollPane(panelNames);
+        this.catalogShelves = new DeskCatalogShelves(this);
+        this.scrollShelves = new JScrollPane(catalogShelves);
+        this.catalogNamers = new DeskCatalogNamers(Config.load(archBase.getRoot()).getNamers());
+        this.scrollNaming = new JScrollPane(catalogNamers);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(DeskIcon.getLogo());
         setSize(800, 600);
