@@ -5,18 +5,19 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import org.apache.commons.io.FilenameUtils;
 import br.com.pointel.jarch.mage.WizDesk;
 
@@ -47,10 +48,8 @@ public class DeskCatalog extends JFrame {
     private final JSplitPane splitShelf = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panelShelf, splitNaming);
 
     private final JPanel panelActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 4));
-    private final ButtonGroup groupActions = new ButtonGroup();
-    private final JRadioButton radioCopy = new JRadioButton("Copy");
-    private final JRadioButton radioMove = new JRadioButton("Move");
-    private final JButton buttonConfirm = new JButton("Confirm");
+    private final JButton buttonCopy = new JButton("Copy");
+    private final JButton buttonMove = new JButton("Move");
     private final JButton buttonCancel = new JButton("Cancel");
 
     public DeskCatalog(ArchBase archBase, File adding) throws Exception {
@@ -82,11 +81,23 @@ public class DeskCatalog extends JFrame {
         insertComponentsActions();
         splitNaming.setName("naming");
         splitShelf.setName("shelf");
-        radioCopy.setSelected(true);
+        adding.setReadOnly();
+        textSource.setText(adding.getAbsolutePath());
+        textSource.append("");
         buttonShelf.addActionListener(e -> actShelf());
         buttonNaming.addActionListener(e -> actNaming());
-        buttonConfirm.addActionListener(e -> actConfirm());
+        buttonCopy.setMnemonic('C');
+        buttonCopy.addActionListener(e -> actCopy());
+        buttonMove.setMnemonic('D');
+        buttonMove.addActionListener(e -> actMove());
+        buttonCancel.setMnemonic('X');
         buttonCancel.addActionListener(e -> actCancel());
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                initLoader();
+            }
+        });        
     }
 
     private void insertComponentsShelf() {
@@ -147,13 +158,24 @@ public class DeskCatalog extends JFrame {
     }
 
     private void insertComponentsActions() {
-        groupActions.add(radioCopy);
-        groupActions.add(radioMove);
-        panelActions.add(radioCopy);
-        panelActions.add(radioMove);
-        panelActions.add(buttonConfirm);
+        panelActions.add(buttonCopy);
+        panelActions.add(buttonMove);
         panelActions.add(buttonCancel);
         panelBody.add(panelActions, BorderLayout.SOUTH);
+    }
+
+    private void initLoader() {
+        new Thread(() -> {
+            try {
+                var source =  new DochReader(adding).read();
+                SwingUtilities.invokeLater(() -> {
+                    textSource.append("\n\n");
+                    textSource.append(source);
+                });
+            } catch (Exception e) {
+                WizDesk.showError(e);
+            }
+        }, "DeskCatalog - Loader").start();
     }
 
     private void actShelf() {
@@ -164,14 +186,22 @@ public class DeskCatalog extends JFrame {
         // |TODO| implement actNaming
     }
 
-    private void actConfirm() {
+    private void actCopy() {
+        actConfirm(false);
+    }
+
+    private void actMove() {
+        actConfirm(true);
+    }
+
+    private void actConfirm(boolean move) {
         try {
             var folder = catalogShelves.getShelf();
             var fullNamer = catalogNamers.getFullNamer();
             var finalName = ArchNamer.getFinalName(folder, fullNamer);
             var finalFile = new File(folder, finalName + "." + FilenameUtils.getExtension(adding.getName()));
             Files.copy(adding.toPath(), finalFile.toPath());
-            if (radioMove.isSelected()) {
+            if (move) {
                 adding.delete();
             }
             WizDesk.showInfo("Cataloged: " + finalFile.getName() + "\non Shelf: " + folder.getName());
