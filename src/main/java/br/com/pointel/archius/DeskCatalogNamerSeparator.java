@@ -15,6 +15,10 @@ public class DeskCatalogNamerSeparator extends DeskCatalogNamer<ConfigNamerSepar
         return fieldChars.getText();
     }
 
+    public void setPartNamer(String partNamer) {
+        throw new UnsupportedOperationException("The Namer Separator is only configured.");	
+    }
+
     private void initComponents() {
         fieldChars.setEnabled(false);
         fieldChars.setText(getConfigNamer().getChars());

@@ -27,6 +27,15 @@ public class DeskCatalogNamers extends JPanel {
         return result.toString();
     }
 
+    public void setPartNamer(String name, String value) {
+        for (var namer : listNamers) {
+            if (namer.getConfigNamer().getName().equals(name)) {
+                namer.setPartNamer(value);
+                break;
+            }
+        }
+    }
+
     private void initComponents() {
         for (var configNamer : listConfigNamers) {
             var namer = DeskCatalogNamer.create(configNamer);

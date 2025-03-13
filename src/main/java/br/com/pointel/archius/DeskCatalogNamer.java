@@ -38,6 +38,8 @@ public abstract class DeskCatalogNamer<T extends ConfigNamer> extends JPanel {
 
     public abstract String getPartNamer();
 
+    public abstract void setPartNamer(String partNamer);
+
     public T getConfigNamer() {
         return configNamer;
     }

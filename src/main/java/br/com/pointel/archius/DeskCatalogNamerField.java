@@ -21,6 +21,10 @@ public class DeskCatalogNamerField extends DeskCatalogNamer<ConfigNamerField> {
         return result.toString();
     }
 
+    public void setPartNamer(String partNamer) {
+        fieldText.setText(partNamer);
+    }
+
     private void initComponents() {
         fieldPrefix.setEnabled(false);
         fieldPrefix.setText(getConfigNamer().getPrefix());

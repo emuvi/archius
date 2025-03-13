@@ -22,6 +22,10 @@ public class DeskCatalogNamerSerial extends DeskCatalogNamer<ConfigNamerSerial> 
         return result.toString();
     }
 
+    public void setPartNamer(String partNamer) {
+        throw new UnsupportedOperationException("The Namer Serial is only configured.");	
+    }
+
     private void initComponents() {
         fieldPrefix.setEnabled(false);
         fieldPrefix.setText(getConfigNamer().getPrefix());

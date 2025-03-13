@@ -95,10 +95,10 @@ public class DeskCatalogShelves extends JPanel {
         }
         var selected = (String) ofCombo.getSelectedItem();
         if (selected == null || selected.isEmpty()) {
-            return;
+            setShelf(onFolder);
+        } else {
+            setShelf(new File(onFolder, selected));
         }
-        var actual = new File(onFolder, selected);
-        setShelf(actual);
     }
 
 }

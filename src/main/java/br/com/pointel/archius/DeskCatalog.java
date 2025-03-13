@@ -198,7 +198,7 @@ public class DeskCatalog extends JFrame {
         try {
             var folder = catalogShelves.getShelf();
             var fullNamer = catalogNamers.getFullNamer();
-            var finalName = ArchNamer.getFinalName(folder, fullNamer);
+            var finalName = ArchUtils.getFinalName(folder, fullNamer);
             var finalFile = new File(folder, finalName + "." + FilenameUtils.getExtension(adding.getName()));
             Files.copy(adding.toPath(), finalFile.toPath());
             if (move) {

@@ -24,6 +24,10 @@ public class DeskCatalogNamerCombo extends DeskCatalogNamer<ConfigNamerCombo> {
         return result.toString();
     }
 
+    public void setPartNamer(String partNamer) {
+        comboOptions.setSelectedItem(partNamer);
+    }
+
     private void initComponents() {
         fieldPrefix.setEnabled(false);
         fieldPrefix.setText(getConfigNamer().getPrefix());
