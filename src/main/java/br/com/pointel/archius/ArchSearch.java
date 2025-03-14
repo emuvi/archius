@@ -39,7 +39,7 @@ public class ArchSearch {
 
     public ArchSearch(ArchIndex archIndex, String searchWords, Integer searchSpeed) {
         this.archIndex = archIndex;
-        this.searchWords = WizChars.getWords(searchWords)
+        this.searchWords = WizChars.getWordsSet(searchWords)
                         .stream().map(word -> "|" + word + "|").toList();
         this.searchSpeed = searchSpeed;
 
