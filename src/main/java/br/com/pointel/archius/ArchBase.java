@@ -194,7 +194,7 @@ public class ArchBase implements Closeable {
     }
 
     public void delIndexFolder(File folder) throws Exception {
-        archIndex.delIndex(folder);
+        archIndex.delIndexFolder(folder);
     }
 
     public ArchSearch searchFor(String words) {
