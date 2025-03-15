@@ -172,12 +172,14 @@ public class DeskOpen extends JFrame {
         var selectionEnd = textStatus.getSelectionEnd();
         var horizontalPosition = scrollStatus.getHorizontalScrollBar().getValue();
         var verticalPosition = scrollStatus.getVerticalScrollBar().getValue();
+        var progress = archBase.getProgress();
         SwingUtilities.invokeLater(() -> {
             textStatus.setText(status);
             textStatus.setSelectionStart(selectionStart);
             textStatus.setSelectionEnd(selectionEnd);
             scrollStatus.getHorizontalScrollBar().setValue(horizontalPosition);
             scrollStatus.getVerticalScrollBar().setValue(verticalPosition);
+            progressBar.setValue(progress.intValue());
         });
     }
 
