@@ -11,28 +11,38 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.apache.commons.lang3.tuple.Pair;
+import br.com.pointel.jarch.gears.SwingFramer;
 import br.com.pointel.jarch.mage.WizBase;
 import br.com.pointel.jarch.mage.WizChars;
 import br.com.pointel.jarch.mage.WizDesk;
+import br.com.pointel.jarch.mage.WizProps;
 
 public class DeskOpen extends JFrame {
 
     private final ArchBase archBase;
 
-    private final JPanel panelBody = new JPanel();
+    private final JPanel panelBody = new JPanel(new GridBagLayout());
     private final JTextField fieldSearch = new JTextField();
     private final JButton buttonSearch = new JButton("Search");
     private final JButton buttonCatalog = new JButton("Catalog");
-    private final JButton buttonConfig = new JButton("*");
+    private final JButton buttonPlus = new JButton("+");
+    private final JProgressBar progressBar = new JProgressBar();
+    private final JPanel panelPlus = new JPanel(new GridBagLayout());
     private final JTextArea textStatus = new JTextArea();
     private final JScrollPane scrollStatus = new JScrollPane(textStatus);
+    private final JButton buttonConfig = new JButton("Config");
 
     private volatile String lastStatus = "";
+
+    private final SwingFramer framer;
+    private Integer beforePlusWidth;
+    private Integer beforePlusHeight;
 
     public DeskOpen(File folder) throws Exception {
         this.archBase = new ArchBase(folder);
@@ -42,7 +52,7 @@ public class DeskOpen extends JFrame {
         setSize(500, 400);
         setName("archius on " + folder.getName());
         setTitle("Archius on " + folder.getName());
-        WizDesk.initFrame(this);
+        this.framer = WizDesk.initFrame(this);
         WizDesk.initEscaper(this);
         initComponents();
         archBase.load();
@@ -51,10 +61,10 @@ public class DeskOpen extends JFrame {
     private void initComponents() {
         setContentPane(panelBody);
         panelBody.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        panelBody.setLayout(new GridBagLayout());
         insertComponents();
         buttonSearch.addActionListener(e -> actSearch());
         buttonCatalog.addActionListener(e -> actCatalog());
+        buttonPlus.addActionListener(e -> actPlus());
         buttonConfig.addActionListener(e -> actConfig());
         textStatus.setEditable(false);
         textStatus.setLineWrap(true);
@@ -62,12 +72,18 @@ public class DeskOpen extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
-                initUpdater();        
+                initUpdater();
+                beforePlusWidth = WizProps.get(framer.getRootName() + "BEFORE_PLUS_WIDTH", getWidth());
+                beforePlusHeight = WizProps.get(framer.getRootName() + "BEFORE_PLUS_HEIGHT", getHeight());
+                panelPlus.setVisible(WizProps.get(framer.getRootName() + "PLUS_VISIBLE", panelPlus.isVisible()));
             }
 
             @Override
             public void windowClosed(WindowEvent e) {
                 WizBase.closeAside(archBase);
+                WizProps.set(framer.getRootName() + "BEFORE_PLUS_WIDTH", beforePlusWidth);
+                WizProps.set(framer.getRootName() + "BEFORE_PLUS_HEIGHT", beforePlusHeight);
+                WizProps.set(framer.getRootName() + "PLUS_VISIBLE", panelPlus.isVisible());
             }
         });
     }
@@ -83,6 +99,7 @@ public class DeskOpen extends JFrame {
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.BOTH;
         panelBody.add(fieldSearch, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -90,6 +107,7 @@ public class DeskOpen extends JFrame {
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.NONE;
         panelBody.add(buttonSearch, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 2;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -97,20 +115,46 @@ public class DeskOpen extends JFrame {
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.NONE;
         panelBody.add(buttonCatalog, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 3;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.NONE;
-        panelBody.add(buttonConfig, constraints);
+        panelBody.add(buttonPlus, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = 4;
         constraints.weightx = 1;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        panelBody.add(progressBar, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 4;
+        constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
-        panelBody.add(scrollStatus, constraints);
+        panelBody.add(panelPlus, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        panelPlus.add(scrollStatus, constraints);
+        constraints.anchor = GridBagConstraints.NORTHEAST;
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.weightx = 1;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.NONE;
+        panelPlus.add(buttonConfig, constraints);
     }
 
     private void initUpdater() {
@@ -178,6 +222,15 @@ public class DeskOpen extends JFrame {
         } catch (Exception e) {
             WizDesk.showError(e);
         }
+    }
+
+    private void actPlus() {
+        var actualWidth = getWidth();
+        var actualHeight = getHeight();
+        panelPlus.setVisible(!panelPlus.isVisible());
+        setSize(beforePlusWidth, beforePlusHeight);
+        beforePlusWidth = actualWidth;
+        beforePlusHeight = actualHeight;
     }
 
     private void actConfig() {
