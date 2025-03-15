@@ -34,15 +34,81 @@ public class ArchIndex implements Closeable {
         return indexData.getIndexedByName(file.getName());
     }
 
-    public void makeIndex(File file) throws Exception {
+    public Long getIndexedFolder(File folder) throws Exception {
+        if (!isInRoot(folder)) {
+            throw new Exception("The folder is not in the root.");
+        }
+        var indexData = getIndexData(folder);
+        return indexData.getIndexedByName(".");
+    }
+
+    public String makeWords(File file) throws Exception {
         if (!isInRoot(file)) {
             throw new Exception("The file is not in the root.");
         }
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
-        var words = " " + String.join(" ", WizChars.getWordsSet(source)) + " ";
+        var words = " " + String.join(" ", WizChars.getWordsKeySet(source)) + " ";
         indexData.putFile(file.getName(), words, file.lastModified());
+        return words;
+    }
+
+    public String getWords(File file) throws Exception {
+        if (!isInRoot(file)) {
+            throw new Exception("The file is not in the root.");
+        }
+        var folder = file.getParentFile();
+        var indexData = getIndexData(folder);
+        var indexed = indexData.getIndexedByName(file.getName());
+        if (indexed == null || indexed < file.lastModified()) {
+            return makeWords(file);
+        }
+        return indexData.getWordsByName(file.getName());
+    }
+
+    public String makeWordsFolder(File folder) throws Exception {
+        if (!isInRoot(folder)) {
+            throw new Exception("The folder is not in the root.");
+        }
+        var indexData = getIndexData(folder);
+        var source = new StringBuilder();
+        var biggerLastModified = 0L;
+        for (var inside : folder.listFiles()) {
+            if (inside.isFile()) {
+                source.append(" ");
+                source.append(getWords(inside));
+                if (inside.lastModified() > biggerLastModified) {
+                    biggerLastModified = inside.lastModified();
+                }
+            }
+        }
+        var words = " " + String.join(" ", WizChars.getWordsKeySet(source.toString().trim())) + " ";
+        indexData.putFile(".", words, biggerLastModified);
+        return words;
+    }
+
+    public String getWordsFolder(File folder) throws Exception {
+        if (!isInRoot(folder)) {
+            throw new Exception("The folder is not in the root.");
+        }
+        var indexData = getIndexData(folder);
+        var indexed = indexData.getIndexedByName(".");
+        if (indexed == null) {
+            return makeWordsFolder(folder);
+        }
+        var biggerLastModified = 0L;
+        for (var inside : folder.listFiles()) {
+            if (inside.isFile()) {
+                if (inside.lastModified() > biggerLastModified) {
+                    biggerLastModified = inside.lastModified();
+                }
+            }
+        }
+        if (indexed < biggerLastModified) {
+            return makeWordsFolder(folder);
+        }
+        return indexData.getWordsByName(".");
     }
 
     public void delIndex(File file) throws Exception {
@@ -52,6 +118,14 @@ public class ArchIndex implements Closeable {
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         indexData.delFile(file.getName());
+    }
+
+    public void delIndexFolder(File folder) throws Exception {
+        if (!isInRoot(folder)) {
+            throw new Exception("The folder is not in the root.");
+        }
+        var indexData = getIndexData(folder);
+        indexData.delFile(".");
     }
 
     public ArchSearch searchFor(String words) {

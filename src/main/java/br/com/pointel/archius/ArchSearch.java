@@ -39,7 +39,7 @@ public class ArchSearch {
 
     public ArchSearch(ArchIndex archIndex, String searchWords, Integer searchSpeed) {
         this.archIndex = archIndex;
-        this.searchWords = WizChars.getWordsSet(searchWords)
+        this.searchWords = WizChars.getWordsKeySet(searchWords)
                         .stream().map(word -> " " + word + " ").toList();
         this.searchSpeed = searchSpeed;
 
@@ -182,7 +182,7 @@ public class ArchSearch {
                 var indexData = archIndex.getIndexData(folder);
                 var indexed = indexData.getIndexedByName(file.getName());
                 if (indexed == null || !Objects.equals(indexed, file.lastModified())) {
-                    archIndex.makeIndex(file);
+                    archIndex.makeWords(file);
                 }
                 var fileWords = indexData.getWordsByName(file.getName());
                 var found = true;
