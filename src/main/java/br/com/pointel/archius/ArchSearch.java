@@ -182,7 +182,7 @@ public class ArchSearch {
                 var indexData = archIndex.getIndexData(folder);
                 var indexed = indexData.getIndexedByName(file.getName());
                 if (indexed == null || !Objects.equals(indexed, file.lastModified())) {
-                    archIndex.makeWords(file);
+                    archIndex.getWords(file);
                 }
                 var fileWords = indexData.getWordsByName(file.getName());
                 var found = true;

@@ -234,7 +234,7 @@ public class ArchBaseLoad {
             }
             try {
                 archBase.sendToListeners("Indexing: " + file.getName());
-                archBase.makeWords(file);
+                archBase.getWords(file);
                 archBase.sendToListeners("Indexed: " + file.getName());
                 this.statusNumberOfIndexed.incrementAndGet();
             } catch (Exception e) {

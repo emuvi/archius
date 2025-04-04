@@ -42,10 +42,7 @@ public class ArchIndex implements Closeable {
         return indexData.getIndexedByName(".");
     }
 
-    public String makeWords(File file) throws Exception {
-        if (!isInRoot(file)) {
-            throw new Exception("The file is not in the root.");
-        }
+    private String makeWords(File file) throws Exception {
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
@@ -67,10 +64,7 @@ public class ArchIndex implements Closeable {
         return indexData.getWordsByName(file.getName());
     }
 
-    public String makeWordsFolder(File folder) throws Exception {
-        if (!isInRoot(folder)) {
-            throw new Exception("The folder is not in the root.");
-        }
+    private String makeWordsFolder(File folder) throws Exception {
         var indexData = getIndexData(folder);
         var source = new StringBuilder();
         var biggerLastModified = 0L;

@@ -173,16 +173,8 @@ public class ArchBase implements Closeable {
         return archIndex.getIndexedFolder(folder);
     }
 
-    public String makeWords(File path) throws Exception {
-        return archIndex.makeWords(path);
-    }
-
     public String getWords(File path) throws Exception {
         return archIndex.getWords(path);
-    }
-
-    public String makeWordsFolder(File folder) throws Exception {
-        return archIndex.makeWordsFolder(folder);
     }
 
     public String getWordsFolder(File folder) throws Exception {
