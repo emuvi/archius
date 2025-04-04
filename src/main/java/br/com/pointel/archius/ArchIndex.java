@@ -39,7 +39,7 @@ public class ArchIndex implements Closeable {
             throw new Exception("The folder is not in the root.");
         }
         var indexData = getIndexData(folder);
-        return indexData.getIndexedByName(".");
+        return indexData.getIndexedByName("/.");
     }
 
     private String makeWords(File file) throws Exception {
@@ -78,7 +78,7 @@ public class ArchIndex implements Closeable {
             }
         }
         var words = " " + String.join(" ", WizChars.getWordsKeySet(source.toString().trim())) + " ";
-        indexData.putFile(".", words, biggerLastModified);
+        indexData.putFile("/.", words, biggerLastModified);
         return words;
     }
 
@@ -87,7 +87,7 @@ public class ArchIndex implements Closeable {
             throw new Exception("The folder is not in the root.");
         }
         var indexData = getIndexData(folder);
-        var indexed = indexData.getIndexedByName(".");
+        var indexed = indexData.getIndexedByName("/.");
         if (indexed == null) {
             return makeWordsFolder(folder);
         }
@@ -102,7 +102,7 @@ public class ArchIndex implements Closeable {
         if (indexed < biggerLastModified) {
             return makeWordsFolder(folder);
         }
-        return indexData.getWordsByName(".");
+        return indexData.getWordsByName("/.");
     }
 
     public void delIndex(File file) throws Exception {
@@ -119,7 +119,7 @@ public class ArchIndex implements Closeable {
             throw new Exception("The folder is not in the root.");
         }
         var indexData = getIndexData(folder);
-        indexData.delFile(".");
+        indexData.delFile("/.");
     }
 
     public ArchSearch searchFor(String words) {
