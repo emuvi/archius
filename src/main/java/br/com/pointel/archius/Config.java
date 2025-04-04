@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Config implements Serializable {
 
-    private static final String CONFIG_NAME = "arch-config.sdb";
+    private static final String CONFIG_NAME = "arch-config.ser";
 
     public static Config load(File root) throws Exception {
         var configFile = new File(root, CONFIG_NAME);

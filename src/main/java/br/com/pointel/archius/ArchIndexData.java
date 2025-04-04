@@ -15,7 +15,7 @@ public class ArchIndexData implements Closeable {
 
     public ArchIndexData(File folder) throws Exception {
         this.connection = DriverManager.getConnection("jdbc:sqlite:"
-                        + new File(folder, "arch-index.sdb").getAbsolutePath());
+                        + new File(folder, "arch-index.db3").getAbsolutePath());
         this.initDatabase();
     }
 

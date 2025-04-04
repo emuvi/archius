@@ -14,7 +14,7 @@ public class ArchBaseData implements Closeable {
 
     public ArchBaseData(File root) throws Exception {
         this.connection = DriverManager.getConnection("jdbc:sqlite:"
-                        + new File(root, "arch-base.sdb").getAbsolutePath());
+                        + new File(root, "arch-base.db3").getAbsolutePath());
         this.initDatabase();
     }
 

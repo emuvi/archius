@@ -165,7 +165,7 @@ public class ArchBaseLoad {
             return;
         }
         if (path.isFile()) {
-            if (!(path.getName().startsWith("arch-") && path.getName().endsWith(".sdb"))) {
+            if (!ArchUtils.isArchFile(path)) {
                 filesToVerify.addLast(path);
                 this.statusProgressMax.incrementAndGet();
                 this.statusNumberOfFiles.incrementAndGet();

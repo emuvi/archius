@@ -179,11 +179,11 @@ public class DeskCatalog extends JFrame {
     }
 
     private void actShelf() {
-        // |TODO| implement actShelf
+        // | TODO | implement actShelf
     }
 
     private void actNaming() {
-        // |TODO| implement actNaming
+        // | TODO | implement actNaming
     }
 
     private void actCopy() {

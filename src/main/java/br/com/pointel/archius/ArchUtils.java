@@ -8,6 +8,11 @@ import br.com.pointel.jarch.mage.WizChars;
 
 public class ArchUtils {
 
+    public static Boolean isArchFile(File path) {
+        return path.getName().startsWith("arch-") 
+                        && (path.getName().endsWith(".db3") || path.getName().endsWith(".ser"));
+    }
+
     public static String getFinalName(File folder, String fullNamer) {
         var result = fullNamer;
         var startSlash = result.indexOf('/');
