@@ -164,12 +164,10 @@ public class ArchBaseLoad {
         if (shouldStop.get()) {
             return;
         }
-        if (path.isFile()) {
-            if (!ArchUtils.isArchFile(path)) {
-                filesToVerify.addLast(path);
-                this.statusProgressMax.incrementAndGet();
-                this.statusNumberOfFiles.incrementAndGet();
-            }
+        if (path.isFile() && !ArchUtils.isArchFile(path)) {
+            filesToVerify.addLast(path);
+            this.statusProgressMax.incrementAndGet();
+            this.statusNumberOfFiles.incrementAndGet();
         } else if (path.isDirectory()) {
             for (var inside : path.listFiles()) {
                 loadFiles(inside);

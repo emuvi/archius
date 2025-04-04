@@ -149,7 +149,7 @@ public class ArchSearch {
                 loadFolders(inside);
             }
             this.statusNumberOfFolders.incrementAndGet();
-        } else if (path.isFile()) {
+        } else if (path.isFile() && !ArchUtils.isArchFile(path)) {
             synchronized (filesToSearch) {
                 filesToSearch.addLast(path);
             }

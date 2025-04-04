@@ -75,7 +75,7 @@ public class ArchIndex implements Closeable {
         var source = new StringBuilder();
         var biggerLastModified = 0L;
         for (var inside : folder.listFiles()) {
-            if (inside.isFile()) {
+            if (inside.isFile() && !ArchUtils.isArchFile(inside)) {
                 source.append(" ");
                 source.append(getWords(inside));
                 if (inside.lastModified() > biggerLastModified) {
@@ -99,7 +99,7 @@ public class ArchIndex implements Closeable {
         }
         var biggerLastModified = 0L;
         for (var inside : folder.listFiles()) {
-            if (inside.isFile()) {
+            if (inside.isFile() && !ArchUtils.isArchFile(inside)) {
                 if (inside.lastModified() > biggerLastModified) {
                     biggerLastModified = inside.lastModified();
                 }
