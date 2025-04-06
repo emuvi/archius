@@ -103,10 +103,9 @@ public class DeskConfigNamers extends JPanel {
     private void actEdit() {
         int selected = listNamers.getSelectedIndex();
         if (selected >= 0) {
-            new DeskConfigNamersEdit(this,
-                            namer -> modelNamers.set(selected, namer))
-                                            .load(modelNamers.get(selected))
-                                            .setVisible(true);
+            new DeskConfigNamersEdit(this, namer -> modelNamers.set(selected, namer))
+                            .load(modelNamers.get(selected))
+                            .setVisible(true);
         }
     }
 
