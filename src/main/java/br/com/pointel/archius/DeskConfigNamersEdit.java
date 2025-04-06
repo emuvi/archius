@@ -114,6 +114,7 @@ public class DeskConfigNamersEdit extends JFrame {
         buttonConfirm.addActionListener(e -> actConfirm());
         buttonCancel.addActionListener(e -> actCancel());
         insertComponents();
+        WizDesk.cleanAllNames(panelBody);
     }
 
     private void insertComponents() {
