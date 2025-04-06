@@ -84,7 +84,7 @@ public class DeskOpen extends JFrame {
             }
 
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 WizBase.closeAside(archBase);
                 WizProps.set(framer.getRootName() + "BEFORE_PLUS_WIDTH", beforePlusWidth);
                 WizProps.set(framer.getRootName() + "BEFORE_PLUS_HEIGHT", beforePlusHeight);
