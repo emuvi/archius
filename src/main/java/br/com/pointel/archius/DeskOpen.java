@@ -7,6 +7,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.apache.commons.lang3.tuple.Pair;
+import br.com.pointel.jarch.gears.SwingDropper;
 import br.com.pointel.jarch.gears.SwingFramer;
 import br.com.pointel.jarch.mage.WizBase;
 import br.com.pointel.jarch.mage.WizChars;
@@ -41,6 +44,7 @@ public class DeskOpen extends JFrame {
     private volatile String lastStatus = "";
 
     private final SwingFramer framer;
+
     private Integer beforePlusWidth;
     private Integer beforePlusHeight;
 
@@ -64,6 +68,7 @@ public class DeskOpen extends JFrame {
         insertComponents();
         buttonSearch.addActionListener(e -> actSearch());
         buttonCatalog.addActionListener(e -> actCatalog());
+        new SwingDropper(files -> openCatalogsFor(files), buttonCatalog).init();
         buttonPlus.addActionListener(e -> actPlus());
         buttonConfig.addActionListener(e -> actConfig());
         textStatus.setEditable(false);
@@ -217,12 +222,20 @@ public class DeskOpen extends JFrame {
         try {
             var selected = WizDesk.selectFiles(null);
             if (selected != null) {
-                for (var adding : selected) {
-                    new DeskCatalog(archBase, adding).setVisible(true);
-                }
+                openCatalogsFor(Arrays.asList(selected));
             }
         } catch (Exception e) {
             WizDesk.showError(e);
+        }
+    }
+
+    private void openCatalogsFor(List<File> files) {
+        for (var file : files) {
+            try {
+                new DeskCatalog(archBase, file).setVisible(true);
+            } catch (Exception e) {
+                WizDesk.showError(e);
+            }
         }
     }
 
