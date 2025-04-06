@@ -28,7 +28,7 @@ public abstract class ConfigNamer implements Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return (Boolean.TRUE.equals(required) ? "* " : "  ") + name;
     }
 
 }

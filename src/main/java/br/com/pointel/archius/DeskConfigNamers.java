@@ -116,6 +116,4 @@ public class DeskConfigNamers extends JPanel {
         }
     }
 
-
-
 }
