@@ -47,7 +47,7 @@ public class DeskBrowse extends JFrame {
         setSize(500, 600);
         setName("browse on " + archBase.getRoot().getName());
         setTitle("Browse on " + archBase.getRoot().getName());
-        WizDesk.initFrame(this);
+        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
         WizDesk.initEscaper(this);
         initComponents();
     }

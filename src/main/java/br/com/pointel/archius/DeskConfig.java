@@ -30,7 +30,7 @@ public class DeskConfig extends JFrame {
         setSize(500, 400);
         setName("config on " + archBase.getRoot().getName());
         setTitle("Config on " + archBase.getRoot().getName());
-        WizDesk.initFrame(this);
+        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
         WizDesk.initEscaper(this);
         initComponents();
     }

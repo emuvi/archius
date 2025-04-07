@@ -67,7 +67,7 @@ public class DeskConfigNamersEdit extends JFrame {
         setSize(300, 200);
         setName("namers edit on " + deskConfigNamers.getRoot().getName());
         setTitle("Namers Edit on " + deskConfigNamers.getRoot().getName());
-        WizDesk.initFrame(this);
+        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
         WizDesk.initEscaper(this);
         initComponents();
     }

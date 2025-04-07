@@ -37,7 +37,7 @@ public class DeskSearch extends JFrame {
         setSize(500, 400);
         setName("search on " + archSearch.getRoot().getName());
         setTitle("Search on " + archSearch.getRoot().getName());
-        WizDesk.initFrame(this);
+        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
         WizDesk.initEscaper(this);
         initComponents();
     }

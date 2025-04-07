@@ -57,7 +57,7 @@ public class DeskOpen extends JFrame {
         setSize(500, 400);
         setName("archius on " + folder.getName());
         setTitle("Archius on " + folder.getName());
-        this.framer = WizDesk.initFrame(this);
+        this.framer = WizDesk.initFrame(this, Desk.DEFAULT_FONT);
         WizDesk.initEscaper(this);
         initComponents();
         archBase.load();

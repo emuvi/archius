@@ -65,7 +65,7 @@ public class DeskCatalog extends JFrame {
         setSize(800, 600);
         setName("catalog on " + archBase.getRoot().getName());
         setTitle("Catalog on " + archBase.getRoot().getName());
-        WizDesk.initFrame(this);
+        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
         WizDesk.initEscaper(this);
         initComponents();
     }
