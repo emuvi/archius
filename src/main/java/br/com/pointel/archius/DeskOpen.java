@@ -31,6 +31,7 @@ public class DeskOpen extends JFrame {
     private final ArchBase archBase;
 
     private final JPanel panelBody = new JPanel(new GridBagLayout());
+    private final JButton buttonBrowse = new JButton("Browse");
     private final JTextField fieldSearch = new JTextField();
     private final JButton buttonSearch = new JButton("Search");
     private final JButton buttonCatalog = new JButton("Catalog");
@@ -66,6 +67,7 @@ public class DeskOpen extends JFrame {
         setContentPane(panelBody);
         panelBody.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         insertComponents();
+        buttonBrowse.addActionListener(e -> actBrowse());
         buttonSearch.addActionListener(e -> actSearch());
         buttonCatalog.addActionListener(e -> actCatalog());
         new SwingDropper(files -> openCatalogsFor(files), buttonCatalog).init();
@@ -100,18 +102,17 @@ public class DeskOpen extends JFrame {
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.NONE;
+        panelBody.add(buttonBrowse, constraints);
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
         constraints.weightx = 1;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.BOTH;
         panelBody.add(fieldSearch, constraints);
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.weightx = 0;
-        constraints.weighty = 0;
-        constraints.fill = GridBagConstraints.NONE;
-        panelBody.add(buttonSearch, constraints);
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 2;
         constraints.gridy = 0;
@@ -119,9 +120,17 @@ public class DeskOpen extends JFrame {
         constraints.weightx = 0;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.NONE;
-        panelBody.add(buttonCatalog, constraints);
+        panelBody.add(buttonSearch, constraints);
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 3;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.NONE;
+        panelBody.add(buttonCatalog, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.gridx = 4;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0;
@@ -131,7 +140,7 @@ public class DeskOpen extends JFrame {
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 0;
         constraints.gridy = 1;
-        constraints.gridwidth = 4;
+        constraints.gridwidth = 5;
         constraints.weightx = 1;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -139,7 +148,7 @@ public class DeskOpen extends JFrame {
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.gridx = 0;
         constraints.gridy = 2;
-        constraints.gridwidth = 4;
+        constraints.gridwidth = 5;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -208,6 +217,14 @@ public class DeskOpen extends JFrame {
                         archBase.getStatusNumberOfErrors().toString()));
         var status = WizChars.mountGrid(grid).trim() + "\n\nLast Status:\n" + lastStatus;
         return status;
+    }
+
+    private void actBrowse() {
+        try {
+            new DeskBrowse(archBase).setVisible(true);
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
     }
 
     private void actSearch() {
