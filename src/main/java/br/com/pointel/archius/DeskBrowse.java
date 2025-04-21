@@ -4,6 +4,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -16,12 +20,15 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import br.com.pointel.jarch.mage.WizDesk;
+import br.com.pointel.jarch.mage.WizRand;
 
 public class DeskBrowse extends JFrame {
 
@@ -39,6 +46,12 @@ public class DeskBrowse extends JFrame {
     private final DefaultListModel<DisplayAssets> modelAssets = new DefaultListModel<>();
     private final JList<DisplayAssets> listAssets = new JList<>(modelAssets);
     private final JScrollPane scrollAssets = new JScrollPane(listAssets);
+    private final JPopupMenu popupMenu = new JPopupMenu();
+    private final JMenuItem menuOpen = new JMenuItem("Open");
+    private final JMenuItem menuSelect = new JMenuItem("Select");
+    private final JMenuItem menuRandom = new JMenuItem("Random");
+
+    private JList<? extends DisplayItem> actualList = null;
 
     public DeskBrowse(ArchBase archBase) {
         this.archBase = archBase;
@@ -60,10 +73,43 @@ public class DeskBrowse extends JFrame {
         comboSubFolders.addActionListener(e -> selectSubFolder(e));
         buttonSearch.addActionListener(e -> actSearch(e));
         listFolder.addListSelectionListener(e -> listFolderSelectionChanged(e));
+        initActualListSelection();
+        WizDesk.addPopup(listFolder, popupMenu);
+        WizDesk.addPopup(listAssets, popupMenu);
+        WizDesk.addButton(popupMenu, menuOpen, e -> actOpen(e));
+        WizDesk.addButton(popupMenu, menuSelect, e -> actSelect(e));
+        WizDesk.addButton(popupMenu, menuRandom, e -> actRandom(e));
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
                 loadFolders();
+            }
+        });
+    }
+
+    private void initActualListSelection() {
+        listFolder.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                actualList = listFolder;
+            }
+        });
+        listFolder.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                actualList = listFolder;
+            }
+        });
+        listAssets.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                actualList = listAssets;
+            }
+        });
+        listAssets.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                actualList = listAssets;
             }
         });
     }
@@ -274,6 +320,67 @@ public class DeskBrowse extends JFrame {
                 }
             }
         }
+    }
+
+    private JList<? extends DisplayItem> getActualList() throws Exception {
+        if (actualList == null) {
+            throw new Exception("Could not identify the actual list");
+        } else {
+            return actualList;
+        }
+    }
+
+    private void actOpen(ActionEvent evt) {
+        try {
+            doOpen(getActualList());
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
+    }
+
+    private void doOpen(JList<? extends DisplayItem> list) throws Exception {
+        var selected = list.getSelectedValue();
+        if (selected != null) {
+            WizDesk.open(selected.path);
+        }
+    }
+
+    private void actSelect(ActionEvent evt) {
+        try {
+            doSelect(getActualList());
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
+    }
+
+    private void doSelect(JList<? extends DisplayItem> list) throws Exception {
+        var selected = list.getSelectedValue();
+        if (selected != null) {
+            WizDesk.exploreAndSelect(selected.path);
+        }
+    }
+
+    private void actRandom(ActionEvent evt) {
+        try {
+            doRandom(getActualList());
+        } catch (Exception e) {
+            WizDesk.showError(e);
+        }
+    }
+
+    private void doRandom(JList<? extends DisplayItem> list) {
+        var selected = list.getSelectedIndices();
+        var toSelectIndex = -1;
+        if (selected != null && selected.length > 1) {
+            toSelectIndex = selected[WizRand.getInt(selected.length)];
+        } else {
+            toSelectIndex = WizRand.getInt(list.getModel().getSize());
+        }
+        if (toSelectIndex == -1) {
+            return;
+        }
+        var toSelectValue = list.getModel().getElementAt(toSelectIndex);
+        list.setSelectedValue(toSelectValue, true);
     }
 
     private class DisplayItem {
