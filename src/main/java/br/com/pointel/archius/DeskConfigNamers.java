@@ -73,7 +73,7 @@ public class DeskConfigNamers extends JPanel {
         buttonAdd.addActionListener(e -> actAdd());
         buttonEdit.addActionListener(e -> actEdit());
         buttonDel.addActionListener(e -> actDel());
-        WizDesk.addActionToDefaultInput(listNamers, e -> actEdit());
+        WizDesk.addDefaultAction(listNamers, e -> actEdit());
     }
 
     private void actUp() {

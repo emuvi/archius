@@ -48,15 +48,15 @@ public class DeskMenu extends JPopupMenu {
     }
     
     private void initMenuItems() {
-        WizDesk.addMenu(this, menuOpen, e -> callOpen());
+        WizDesk.addButton(this, menuOpen, e -> callOpen());
         addSeparator();
-        WizDesk.addMenu(this, menuResize);
-        WizDesk.addMenu(menuResize, menuResize32, e -> desk.setSize(32, 32));
-        WizDesk.addMenu(menuResize, menuResize64, e -> desk.setSize(64, 64));
-        WizDesk.addMenu(menuResize, menuResize128, e -> desk.setSize(128, 128));
-        WizDesk.addMenu(menuResize, menuResize256, e -> desk.setSize(256, 256));
-        WizDesk.addMenu(this, menuOnTop, e -> callOnTop());
-        WizDesk.addMenu(this, menuExit, e -> callExit());
+        WizDesk.addButton(this, menuResize);
+        WizDesk.addButton(menuResize, menuResize32, e -> desk.setSize(32, 32));
+        WizDesk.addButton(menuResize, menuResize64, e -> desk.setSize(64, 64));
+        WizDesk.addButton(menuResize, menuResize128, e -> desk.setSize(128, 128));
+        WizDesk.addButton(menuResize, menuResize256, e -> desk.setSize(256, 256));
+        WizDesk.addButton(this, menuOnTop, e -> callOnTop());
+        WizDesk.addButton(this, menuExit, e -> callExit());
     }
 
     private final String LAST_SELECTED_FOLDER = "ARCHIUS_LAST_SELECTED_FOLDER";

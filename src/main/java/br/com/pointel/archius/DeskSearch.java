@@ -58,7 +58,7 @@ public class DeskSearch extends JFrame {
                 archSearch.stop();
             }
         });
-        WizDesk.addActionToDefaultInput(listFounds, e -> actOpen());
+        WizDesk.addDefaultAction(listFounds, e -> actOpen());
     }
 
     private void insertComponents() {
