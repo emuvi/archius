@@ -1,7 +1,9 @@
 package br.com.pointel.archius;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 public class DochReaderPDF {
@@ -30,5 +32,16 @@ public class DochReaderPDF {
             return doc.getNumberOfPages();
         }
     }
+
+    public BufferedImage getPageAsImage(int pageNumber, int dpi) throws Exception {
+        try (var doc = PDDocument.load(file)) {
+            if (pageNumber < 0 || pageNumber >= doc.getNumberOfPages()) {
+                throw new IllegalArgumentException("Page number " + pageNumber + " is out of bounds. The PDF has " + doc.getNumberOfPages() + " pages.");
+            }
+            PDFRenderer pdfRenderer = new PDFRenderer(doc);
+            BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
+            return bufferedImage;
+        }
+    } 
 
 }

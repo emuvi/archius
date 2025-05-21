@@ -1,5 +1,6 @@
 package br.com.pointel.archius;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class DochReader {
@@ -37,6 +38,18 @@ public class DochReader {
             return 0;
         } else {
             return 0;
+        }
+    }
+
+    public BufferedImage getPageAsImage(int pageNumber, int dpi) throws Exception {
+        if (DochReaderPDF.canRead(file)) {
+            return new DochReaderPDF(file).getPageAsImage(pageNumber, dpi);
+        } else if (DochReaderMSO.canRead(file)) {
+            return null;
+        } else if (DochReaderTXT.canRead(file)) {
+            return null;
+        } else {
+            return null;
         }
     }
 
