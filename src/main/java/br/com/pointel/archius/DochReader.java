@@ -28,4 +28,16 @@ public class DochReader {
         }
     }
 
+    public Integer countPages() throws Exception {
+        if (DochReaderPDF.canRead(file)) {
+            return new DochReaderPDF(file).countPages();
+        } else if (DochReaderMSO.canRead(file)) {
+            return 0;
+        } else if (DochReaderTXT.canRead(file)) {
+            return 0;
+        } else {
+            return 0;
+        }
+    }
+
 }

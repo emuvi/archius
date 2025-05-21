@@ -24,4 +24,11 @@ public class DochReaderPDF {
             return stripper.getText(doc);
         }
     }
+
+    public Integer countPages() throws Exception {
+        try (var doc = PDDocument.load(file)) {
+            return doc.getNumberOfPages();
+        }
+    }
+
 }
