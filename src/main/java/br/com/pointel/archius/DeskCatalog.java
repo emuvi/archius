@@ -61,11 +61,11 @@ public class DeskCatalog extends JFrame {
         this.catalogNamers = new DeskCatalogNamers(configNamers);
         this.scrollNaming = new JScrollPane(catalogNamers);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setIconImage(DeskIcon.getLogo());
+        setIconImage(WizDesk.getLogo());
         setSize(800, 600);
         setName("catalog on " + archBase.getRoot().getName());
         setTitle("Catalog on " + archBase.getRoot().getName());
-        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
+        WizDesk.initFrame(this);
         WizDesk.initEscaper(this);
         initComponents();
     }

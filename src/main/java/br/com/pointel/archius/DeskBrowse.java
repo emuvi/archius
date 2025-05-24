@@ -61,11 +61,11 @@ public class DeskBrowse extends JFrame {
     public DeskBrowse(ArchBase archBase) {
         this.archBase = archBase;
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setIconImage(DeskIcon.getLogo());
+        setIconImage(WizDesk.getLogo());
         setSize(500, 600);
         setName("browse on " + archBase.getRoot().getName());
         setTitle("Browse on " + archBase.getRoot().getName());
-        WizDesk.initFrame(this, Desk.DEFAULT_FONT);
+        WizDesk.initFrame(this);
         WizDesk.initEscaper(this);
         initComponents();
     }
