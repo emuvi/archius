@@ -46,7 +46,7 @@ public class ArchIndex implements Closeable {
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
-        var words = " " + String.join(" ", WizChars.getWordsKeySet(source)) + " ";
+        var words = " " + String.join(" ", WizChars.getWordsKeySetOrdered(source)) + " ";
         indexData.putFile(file.getName(), words, file.lastModified());
         return words;
     }
@@ -77,7 +77,7 @@ public class ArchIndex implements Closeable {
                 }
             }
         }
-        var words = " " + String.join(" ", WizChars.getWordsKeySet(source.toString().trim())) + " ";
+        var words = " " + String.join(" ", WizChars.getWordsKeySetOrdered(source.toString().trim())) + " ";
         indexData.putFile("/.", words, biggerLastModified);
         return words;
     }
