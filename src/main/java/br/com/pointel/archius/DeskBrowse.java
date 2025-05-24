@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -35,11 +36,12 @@ public class DeskBrowse extends JFrame {
     private final ArchBase archBase;
 
     private final JPanel panelBody = new JPanel(new GridBagLayout());
-    private final JButton buttonUp = new JButton("↑");
+    private final JButton buttonUp = new JButton("^");
     private final DefaultComboBoxModel<DisplaySubFolder> modelSubFolders = new DefaultComboBoxModel<>();
     private final JComboBox<DisplaySubFolder> comboSubFolders = new JComboBox<>(modelSubFolders);
+    private final JTextField fieldFilter = new JTextField(); 
     private final JTextField fieldSearch = new JTextField(); 
-    private final JButton buttonSearch = new JButton("Search");
+    private final JButton buttonSearch = new JButton(">");
     private final DefaultListModel<DisplayFolder> modelFolder = new DefaultListModel<>();
     private final JList<DisplayFolder> listFolder = new JList<>(modelFolder);
     private final JScrollPane scrollFolder = new JScrollPane(listFolder);
@@ -52,6 +54,9 @@ public class DeskBrowse extends JFrame {
     private final JMenuItem menuRandom = new JMenuItem("Random");
 
     private JList<? extends DisplayItem> actualList = null;
+
+    private Pattern filterPattern = null;
+    private String filterLastUsed = null;
 
     public DeskBrowse(ArchBase archBase) {
         this.archBase = archBase;
@@ -71,6 +76,8 @@ public class DeskBrowse extends JFrame {
         insertComponents();
         buttonUp.addActionListener(e -> actUp(e));
         comboSubFolders.addActionListener(e -> selectSubFolder(e));
+        fieldFilter.setToolTipText("Filter");
+        fieldSearch.setToolTipText("Search");
         buttonSearch.addActionListener(e -> actSearch(e));
         listFolder.addListSelectionListener(e -> listFolderSelectionChanged(e));
         initActualListSelection();
@@ -116,7 +123,7 @@ public class DeskBrowse extends JFrame {
 
     private void insertComponents() {
         var constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.anchor = GridBagConstraints.BASELINE_LEADING;
         constraints.insets = new Insets(2, 2, 2, 2);
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -135,11 +142,18 @@ public class DeskBrowse extends JFrame {
         constraints.gridx = 2;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
-        constraints.weightx = 1;
+        constraints.weightx = 0.5;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        panelBody.add(fieldFilter, constraints);
+        constraints.gridx = 3;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.5;
         constraints.weighty = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         panelBody.add(fieldSearch, constraints);
-        constraints.gridx = 3;
+        constraints.gridx = 4;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0;
@@ -148,14 +162,14 @@ public class DeskBrowse extends JFrame {
         panelBody.add(buttonSearch, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
-        constraints.gridwidth = 4;
+        constraints.gridwidth = 5;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
         panelBody.add(scrollFolder, constraints);
         constraints.gridx = 0;
         constraints.gridy = 2;
-        constraints.gridwidth = 4;
+        constraints.gridwidth = 5;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -189,6 +203,16 @@ public class DeskBrowse extends JFrame {
         }
     }
 
+    private boolean checkFileIsInFilter(File file) {
+        if (!file.isFile()) {
+            return false;
+        }
+        if (filterPattern != null) {
+            return filterPattern.matcher(file.getName()).matches();
+        }
+        return true;
+    }
+
     private void listFolderSelectionChanged(ListSelectionEvent evt) {
         try {
             loadingSubFolders = true;
@@ -201,7 +225,7 @@ public class DeskBrowse extends JFrame {
             }
             for (var selected : allSelected) {
                 for (var inside : selected.path.listFiles()) {
-                    if (inside.isFile()) {
+                    if (checkFileIsInFilter(inside)) {
                         modelAssets.addElement(new DisplayAssets(inside));
                     } else if (inside.isDirectory()) {
                         modelSubFolders.addElement(new DisplaySubFolder(inside));
@@ -272,6 +296,13 @@ public class DeskBrowse extends JFrame {
     }
 
     private void actSearch(ActionEvent evt) {
+        filterPattern = null;
+        if (!fieldFilter.getText().isEmpty()
+                && !Objects.equals(fieldFilter.getText(), filterLastUsed)) {
+            filterPattern = Pattern.compile(fieldFilter.getText());
+            filterLastUsed = fieldFilter.getText();
+        }
+        listFolderSelectionChanged(null);
         var search = fieldSearch.getText().toLowerCase().trim();
         if (search == null || search.isEmpty()) {
             return;
