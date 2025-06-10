@@ -21,7 +21,7 @@ public class ArchIndexData implements Closeable {
 
     public synchronized ArchIndexUnit getByName(String name) throws Exception {
         var select = this.connection.prepareStatement(
-                        "SELECT name, words, indexed FROM files "
+                        "SELECT name, words, likes, indexed FROM files "
                                         + "WHERE name = ?");
         select.setString(1, name);
         var returned = select.executeQuery();
@@ -29,6 +29,7 @@ public class ArchIndexData implements Closeable {
             return new ArchIndexUnit(
                             returned.getString("name"),
                             returned.getString("words"),
+                            returned.getString("likes"),
                             returned.getLong("indexed"));
         } else {
             return null;
@@ -59,15 +60,28 @@ public class ArchIndexData implements Closeable {
         }
     }
 
+    public synchronized String getLikesByName(String name) throws Exception {
+        var select = this.connection.prepareStatement(
+                        "SELECT likes FROM files WHERE name = ?");
+        select.setString(1, name);
+        var returned = select.executeQuery();
+        if (returned.next()) {
+            return returned.getString("likes");
+        } else {
+            return null;
+        }
+    }
+
     public synchronized List<ArchIndexUnit> getAll() throws Exception {
         var select = this.connection.prepareStatement(
-                        "SELECT name, words, indexed FROM files");
+                        "SELECT name, words, likes, indexed FROM files");
         var returned = select.executeQuery();
         var results = new ArrayList<ArchIndexUnit>();
         while (returned.next()) {
             results.add(new ArchIndexUnit(
                             returned.getString("name"),
                             returned.getString("words"),
+                            returned.getString("likes"),
                             returned.getLong("indexed")));
         }
         return results;
@@ -86,17 +100,18 @@ public class ArchIndexData implements Closeable {
         return results;
     }
 
-    public synchronized void putFile(String name, String words, Long indexed) throws Exception {
+    public synchronized void putFile(String name, String words, String likes, Long indexed) throws Exception {
         var delete = this.connection.prepareStatement(
                         "DELETE FROM files WHERE name = ?");
         delete.setString(1, name);
         delete.executeUpdate();
         var insert = this.connection.prepareStatement(
-                        "INSERT INTO files (name, words, indexed) " +
-                                        "VALUES (?, ?, ?)");
+                        "INSERT INTO files (name, words, likes, indexed) " +
+                                        "VALUES (?, ?, ?, ?)");
         insert.setString(1, name);
         insert.setString(2, words);
-        insert.setLong(3, indexed);
+        insert.setString(3, likes);
+        insert.setLong(4, indexed);
         var results = insert.executeUpdate();
         if (results == 0) {
             throw new Exception("Could not put the file.");
@@ -114,7 +129,7 @@ public class ArchIndexData implements Closeable {
         this.connection.createStatement().execute(
                         "CREATE TABLE IF NOT EXISTS "
                                         + "files (name TEXT PRIMARY KEY, "
-                                        + "words TEXT, indexed INTEGER)");
+                                        + "words TEXT, likes TEXT, indexed INTEGER)");
     }
 
     @Override
