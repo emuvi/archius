@@ -46,7 +46,9 @@ public class ArchIndex implements Closeable {
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
-        var words = " " + String.join(" ", WizChars.getWordsKeySetOrdered(source)) + " ";
+        var keyWords = WizChars.getWordsKeySetOrdered(source);
+        keyWords.addAll(WizChars.getWordsKeySetOrdered(file.getAbsolutePath()));
+        var words = " " + String.join(" ", keyWords) + " ";
         indexData.putFile(file.getName(), words, file.lastModified());
         return words;
     }
