@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 import br.com.pointel.jarch.mage.WizChars;
 
 public class ArchIndex implements Closeable {
@@ -42,15 +43,18 @@ public class ArchIndex implements Closeable {
         return indexData.getIndexedByName("/.");
     }
 
-    private String makeWords(File file) throws Exception {
+    private Pair<String, String> makeWordsAndLikes(File file) throws Exception {
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
         var keyWords = WizChars.getWordsKeySetOrdered(source);
         keyWords.addAll(WizChars.getWordsKeySetOrdered(file.getAbsolutePath()));
         var words = " " + String.join(" ", keyWords) + " ";
-        indexData.putFile(file.getName(), words, file.lastModified());
-        return words;
+        var keyWordsLike = WizChars.getWordsLikeKeySetOrdered(source);
+        keyWordsLike.addAll(WizChars.getWordsLikeKeySetOrdered(file.getAbsolutePath()));
+        var likes = " " + String.join(" ", keyWordsLike) + " ";
+        indexData.putFile(file.getName(), words, likes, file.lastModified());
+        return Pair.of(words, likes);
     }
 
     public String getWords(File file) throws Exception {
@@ -61,27 +65,48 @@ public class ArchIndex implements Closeable {
         var indexData = getIndexData(folder);
         var indexed = indexData.getIndexedByName(file.getName());
         if (indexed == null || indexed < file.lastModified()) {
-            return makeWords(file);
+            return makeWordsAndLikes(file).getLeft();
         }
         return indexData.getWordsByName(file.getName());
     }
 
-    private String makeWordsFolder(File folder) throws Exception {
+    public String getLikes(File file) throws Exception {
+        if (!isInRoot(file)) {
+            throw new Exception("The file is not in the root.");
+        }
+        var folder = file.getParentFile();
         var indexData = getIndexData(folder);
-        var source = new StringBuilder();
+        var indexed = indexData.getIndexedByName(file.getName());
+        if (indexed == null || indexed < file.lastModified()) {
+            return makeWordsAndLikes(file).getRight();
+        }
+        return indexData.getLikesByName(file.getName());
+    }
+
+    private Pair<String, String> makeWordsAndLikesFolder(File folder) throws Exception {
+        var indexData = getIndexData(folder);
+        var sourceWords = new StringBuilder();
+        var sourceLikes = new StringBuilder();
         var biggerLastModified = 0L;
         for (var inside : folder.listFiles()) {
             if (inside.isFile() && !ArchUtils.isArchFile(inside)) {
-                source.append(" ");
-                source.append(getWords(inside));
+                sourceWords.append(" ");
+                sourceWords.append(getWords(inside));
+                sourceLikes.append(" ");
+                sourceLikes.append(getLikes(inside));
                 if (inside.lastModified() > biggerLastModified) {
                     biggerLastModified = inside.lastModified();
                 }
             }
         }
-        var words = " " + String.join(" ", WizChars.getWordsKeySetOrdered(source.toString().trim())) + " ";
-        indexData.putFile("/.", words, biggerLastModified);
-        return words;
+        var keyWords = WizChars.getWordsKeySetOrdered(sourceWords.toString());
+        keyWords.addAll(WizChars.getWordsKeySetOrdered(folder.getAbsolutePath()));
+        var words = " " + String.join(" ", keyWords) + " ";
+        var keyWordsLike = WizChars.getWordsLikeKeySetOrdered(sourceLikes.toString());
+        keyWordsLike.addAll(WizChars.getWordsLikeKeySetOrdered(folder.getAbsolutePath()));
+        var likes = " " + String.join(" ", keyWordsLike) + " ";
+        indexData.putFile("/.", words, likes, biggerLastModified);
+        return Pair.of(words, likes);
     }
 
     public String getWordsFolder(File folder) throws Exception {
@@ -91,7 +116,7 @@ public class ArchIndex implements Closeable {
         var indexData = getIndexData(folder);
         var indexed = indexData.getIndexedByName("/.");
         if (indexed == null) {
-            return makeWordsFolder(folder);
+            return makeWordsAndLikesFolder(folder).getLeft();
         }
         var biggerLastModified = 0L;
         for (var inside : folder.listFiles()) {
@@ -102,9 +127,32 @@ public class ArchIndex implements Closeable {
             }
         }
         if (indexed < biggerLastModified) {
-            return makeWordsFolder(folder);
+            return makeWordsAndLikesFolder(folder).getLeft();
         }
         return indexData.getWordsByName("/.");
+    }
+
+    public String getLikesFolder(File folder) throws Exception {
+        if (!isInRoot(folder)) {
+            throw new Exception("The folder is not in the root.");
+        }
+        var indexData = getIndexData(folder);
+        var indexed = indexData.getIndexedByName("/.");
+        if (indexed == null) {
+            return makeWordsAndLikesFolder(folder).getRight();
+        }
+        var biggerLastModified = 0L;
+        for (var inside : folder.listFiles()) {
+            if (inside.isFile() && !ArchUtils.isArchFile(inside)) {
+                if (inside.lastModified() > biggerLastModified) {
+                    biggerLastModified = inside.lastModified();
+                }
+            }
+        }
+        if (indexed < biggerLastModified) {
+            return makeWordsAndLikesFolder(folder).getRight();
+        }
+        return indexData.getLikesByName("/.");
     }
 
     public void delIndex(File file) throws Exception {
