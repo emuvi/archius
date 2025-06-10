@@ -4,18 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import br.com.pointel.jarch.mage.WizBase;
 import br.com.pointel.jarch.mage.WizChars;
-import br.com.pointel.jarch.mage.WizRand;
 
 public class ArchSearch {
 
     private final ArchIndex archIndex;
-    private final List<String> searchWords;
+    private final List<String> searchLikes;
     private final Integer searchSpeed;
 
     private final AtomicBoolean shouldStop;
@@ -39,8 +37,8 @@ public class ArchSearch {
 
     public ArchSearch(ArchIndex archIndex, String searchWords, Integer searchSpeed) {
         this.archIndex = archIndex;
-        this.searchWords = WizChars.getWordsKeySetOrdered(searchWords)
-                        .stream().map(word -> " " + word + " ").toList();
+        this.searchLikes = WizChars.getWordsLikeKeySetOrdered(searchWords).stream()
+                        .map(word -> " " + word + " ").toList();
         this.searchSpeed = searchSpeed;
 
         this.shouldStop = new AtomicBoolean(false);
@@ -170,7 +168,7 @@ public class ArchSearch {
                         break;
                     }
                 } else {
-                    file = filesToSearch.remove((int) WizRand.getInt(filesToSearch.size()));
+                    file = filesToSearch.removeFirst();
                 }
             }
             if (file == null) {
@@ -178,16 +176,10 @@ public class ArchSearch {
                 continue;
             }
             try {
-                var folder = file.getParentFile();
-                var indexData = archIndex.getIndexData(folder);
-                var indexed = indexData.getIndexedByName(file.getName());
-                if (indexed == null || !Objects.equals(indexed, file.lastModified())) {
-                    archIndex.getWords(file);
-                }
-                var fileWords = indexData.getWordsByName(file.getName());
+                var fileLikes = archIndex.getLikes(file);
                 var found = true;
-                for (var word : searchWords) {
-                    if (!fileWords.contains(word)) {
+                for (var searchLike : searchLikes) {
+                    if (!fileLikes.contains(searchLike)) {
                         found = false;
                         break;
                     }
