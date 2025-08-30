@@ -7,14 +7,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
+import br.com.pointel.jarch.data.EOrmSQLite;
+import br.com.pointel.jarch.data.Field;
+import br.com.pointel.jarch.data.Nature;
+import br.com.pointel.jarch.data.Table;
+import br.com.pointel.jarch.data.TableHead;
 
 public class ArchBaseData implements Closeable {
 
     private final Connection connection;
+    private final EOrmSQLite eOrm;
 
     public ArchBaseData(File root) throws Exception {
         this.connection = DriverManager.getConnection("jdbc:sqlite:"
                         + new File(root, "arch-base.db3").getAbsolutePath());
+        this.eOrm = new EOrmSQLite(this.connection);
         this.initDatabase();
     }
 
@@ -131,10 +138,7 @@ public class ArchBaseData implements Closeable {
     }
 
     private void initDatabase() throws Exception {
-        this.connection.createStatement().execute(
-                        "CREATE TABLE IF NOT EXISTS "
-                                        + "files (place TEXT PRIMARY KEY, "
-                                        + "verifier TEXT, modified INTEGER)");
+        eOrm.create(Files, true);
         this.connection.createStatement().execute(
                         "CREATE INDEX IF NOT EXISTS "
                                         + "files_verifier ON files (verifier)");
@@ -148,5 +152,17 @@ public class ArchBaseData implements Closeable {
             throw new IOException(e);
         }
     }
+    
+    private static Field FilesPlace = new Field("place", Nature.CHARS, true, true);
+
+    private static Field FilesVerifier = new Field("verifier", Nature.CHARS);
+
+    private static Field FilesModified = new Field("modified", Nature.LONG);
+
+    private static Table Files = new Table(
+        new TableHead("files"),
+        List.of(FilesPlace, FilesVerifier, FilesModified)
+    );
 
 }
+
