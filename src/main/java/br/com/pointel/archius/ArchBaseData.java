@@ -138,7 +138,7 @@ public class ArchBaseData implements Closeable {
     }
 
     private void initDatabase() throws Exception {
-        eOrm.create(Files, true);
+        eOrm.create(FilesTable, true);
         this.connection.createStatement().execute(
                         "CREATE INDEX IF NOT EXISTS "
                                         + "files_verifier ON files (verifier)");
@@ -153,15 +153,15 @@ public class ArchBaseData implements Closeable {
         }
     }
     
-    private static Field FilesPlace = new Field("place", Nature.CHARS, true, true);
+    private static Field FilesPlaceField = new Field("place", Nature.CHARS, true, true);
 
-    private static Field FilesVerifier = new Field("verifier", Nature.CHARS);
+    private static Field FilesVerifierField = new Field("verifier", Nature.CHARS);
 
-    private static Field FilesModified = new Field("modified", Nature.LONG);
+    private static Field FilesModifiedField = new Field("modified", Nature.LONG);
 
-    private static Table Files = new Table(
+    private static Table FilesTable = new Table(
         new TableHead("files"),
-        List.of(FilesPlace, FilesVerifier, FilesModified)
+        List.of(FilesPlaceField, FilesVerifierField, FilesModifiedField)
     );
 
 }
