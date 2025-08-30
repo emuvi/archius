@@ -71,7 +71,7 @@ public class ArchUtils {
                     }
                 }
             } else if (configNamer instanceof ConfigNamerField namerField) {
-                // |TODO| use NextDelimiter to implement ConfigNamerField
+                // | TODO | use NextDelimiter to implement ConfigNamerField
             } else if (configNamer instanceof ConfigNamerSeparator namerSeparator) {
                 if (processing.startsWith(namerSeparator.getChars())) {
                     processing = processing.substring(namerSeparator.getChars().length());
