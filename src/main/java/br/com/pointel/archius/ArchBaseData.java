@@ -32,13 +32,7 @@ public class ArchBaseData implements Closeable {
 
     public synchronized ArchBaseUnit getByPlace(String place) throws Exception {
         filterFilesByPlace.withValue(place);
-        var resultSet = eOrm.select(selectFilesByPlace);
-        if (resultSet.next()) {
-            var result = selectFilesByPlace.mapResult(resultSet, ArchBaseUnit.class);
-            return result;
-        } else {
-            return null;
-        }
+        return eOrm.select(selectFilesByPlace).mapResult(ArchBaseUnit.class);
     }
 
     public synchronized List<ArchBaseUnit> getByVerifier(String verifier) throws Exception {
