@@ -1,7 +1,8 @@
 package br.com.pointel.archius;
 
 import javax.swing.JTextField;
-import br.com.pointel.jarch.mage.WizChars;
+
+import br.com.pointel.jarch.mage.WizString;
 
 public class DeskCatalogNamerSerial extends DeskCatalogNamer<ConfigNamerSerial> {
 
@@ -31,7 +32,7 @@ public class DeskCatalogNamerSerial extends DeskCatalogNamer<ConfigNamerSerial> 
         fieldPrefix.setText(getConfigNamer().getPrefix());
         fieldPrefix.setColumns(fieldPrefix.getText().length());
         fieldLength.setEnabled(false);
-        fieldLength.setText("/" + WizChars.fill('0', getConfigNamer().getLength()) + "/");
+        fieldLength.setText("/" + WizString.fill('0', getConfigNamer().getLength()) + "/");
         fieldLength.setColumns(fieldSuffix.getText().length());
         fieldSuffix.setEnabled(false);
         fieldSuffix.setText(getConfigNamer().getSuffix());

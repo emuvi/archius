@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,13 +19,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import org.apache.commons.lang3.tuple.Pair;
-import br.com.pointel.jarch.gears.SwingDropper;
-import br.com.pointel.jarch.gears.SwingFramer;
-import br.com.pointel.jarch.mage.WizBase;
-import br.com.pointel.jarch.mage.WizChars;
+
+import br.com.pointel.jarch.data.Pair;
+import br.com.pointel.jarch.gear.SwingDropper;
+import br.com.pointel.jarch.gear.SwingFramer;
 import br.com.pointel.jarch.mage.WizDesk;
+import br.com.pointel.jarch.mage.WizFiles;
 import br.com.pointel.jarch.mage.WizProps;
+import br.com.pointel.jarch.mage.WizString;
+import br.com.pointel.jarch.mage.WizThread;
 
 public class DeskOpen extends JFrame {
 
@@ -87,7 +90,7 @@ public class DeskOpen extends JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                WizBase.closeAside(archBase);
+                WizFiles.closeAside(archBase);
                 WizProps.set(framer.getRootName() + "BEFORE_PLUS_WIDTH", beforePlusWidth);
                 WizProps.set(framer.getRootName() + "BEFORE_PLUS_HEIGHT", beforePlusHeight);
                 WizProps.set(framer.getRootName() + "PLUS_VISIBLE", panelPlus.isVisible());
@@ -175,7 +178,7 @@ public class DeskOpen extends JFrame {
         new Thread(() -> {
             while (isDisplayable()) {
                 updateStatus();
-                WizBase.sleep(500);
+                WizThread.sleep(500);
             }
         }, "DeskOpen - Updater").start();
     }
@@ -215,8 +218,7 @@ public class DeskOpen extends JFrame {
                         archBase.getStatusNumberOfCleaned().toString()));
         grid.add(Pair.of("Number Of Errors",
                         archBase.getStatusNumberOfErrors().toString()));
-        var status = WizChars.mountGrid(grid).trim() + "\n\nLast Status:\n" + lastStatus;
-        return status;
+        return WizString.mountGrid(grid).trim() + "\n\nLast Status:\n" + lastStatus;
     }
 
     private void actBrowse() {

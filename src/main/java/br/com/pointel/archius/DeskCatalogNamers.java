@@ -4,7 +4,7 @@ import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
-import br.com.pointel.jarch.gears.WrapLayout;
+import br.com.pointel.jarch.gear.WrapLayout;
 
 public class DeskCatalogNamers extends JPanel {
 

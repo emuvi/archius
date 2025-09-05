@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.function.Consumer;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -18,8 +19,9 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import br.com.pointel.jarch.mage.WizChars;
+
 import br.com.pointel.jarch.mage.WizDesk;
+import br.com.pointel.jarch.mage.WizString;
 
 public class DeskConfigNamersEdit extends JFrame {
 
@@ -354,7 +356,7 @@ public class DeskConfigNamersEdit extends JFrame {
         ConfigNamer namer = null;
         switch (tabbedPane.getSelectedIndex()) {
             case 0:
-                namer = new ConfigNamerCombo(fieldName.getText(), checkRequired.isSelected(), WizChars.getLines(textComboOptions.getText()), fieldComboPrefix.getText(), fieldComboSuffix.getText());
+                namer = new ConfigNamerCombo(fieldName.getText(), checkRequired.isSelected(), WizString.getLines(textComboOptions.getText()), fieldComboPrefix.getText(), fieldComboSuffix.getText());
                 break;
             case 1:
                 namer = new ConfigNamerField(fieldName.getText(), checkRequired.isSelected(), fieldFieldPrefix.getText(), fieldFieldSuffix.getText());

@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import br.com.pointel.jarch.mage.WizBase;
-import br.com.pointel.jarch.mage.WizChars;
+
+import br.com.pointel.jarch.mage.WizString;
+import br.com.pointel.jarch.mage.WizThread;
 
 public class ArchSearch {
 
@@ -37,7 +38,7 @@ public class ArchSearch {
 
     public ArchSearch(ArchIndex archIndex, String searchWords, Integer searchSpeed) {
         this.archIndex = archIndex;
-        this.searchLikes = WizChars.getWordsLikeKeySetOrdered(searchWords).stream()
+        this.searchLikes = WizString.getWordsLikeKeySetOrdered(searchWords).stream()
                         .map(word -> " " + word + " ").toList();
         this.searchSpeed = searchSpeed;
 
@@ -88,7 +89,7 @@ public class ArchSearch {
     public void stopAndWait() {
         stop();
         while (!isDone()) {
-            WizBase.sleep(10);
+            WizThread.sleep(10);
         }
     }
 
@@ -172,7 +173,7 @@ public class ArchSearch {
                 }
             }
             if (file == null) {
-                WizBase.sleep(100);
+                WizThread.sleep(100);
                 continue;
             }
             try {

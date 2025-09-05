@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import br.com.pointel.jarch.mage.WizBase;
+import br.com.pointel.jarch.mage.WizThread;
 import br.com.pointel.jarch.mage.WizDesk;
 
 public class DeskSearch extends JFrame {
@@ -85,7 +85,7 @@ public class DeskSearch extends JFrame {
                 if (archSearch.gotAll()) {
                     break;
                 }
-                WizBase.sleep(500);
+                WizThread.sleep(500);
             }
         }, "DeskSearch - Updater").start();
     }

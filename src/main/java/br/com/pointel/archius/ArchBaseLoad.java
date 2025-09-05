@@ -7,8 +7,10 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.codec.digest.DigestUtils;
-import br.com.pointel.jarch.mage.WizBase;
+
+import br.com.pointel.jarch.mage.WizThread;
 
 public class ArchBaseLoad {
 
@@ -103,7 +105,7 @@ public class ArchBaseLoad {
     public void stopAndWait() {
         stop();
         while (!isDone()) {
-            WizBase.sleep(10);
+            WizThread.sleep(10);
         }
     }
 
@@ -185,7 +187,7 @@ public class ArchBaseLoad {
                 if (doneLoadFiles.get()) {
                     break;
                 } else {
-                    WizBase.sleep(100);
+                    WizThread.sleep(100);
                     continue;
                 }
             }
@@ -228,7 +230,7 @@ public class ArchBaseLoad {
                 if (doneLoadFiles.get() && isDoneVerifiers()) {
                     break;
                 } else {
-                    WizBase.sleep(100);
+                    WizThread.sleep(100);
                     continue;
                 }
             }
@@ -250,7 +252,7 @@ public class ArchBaseLoad {
     private void makeLinterClean() {
         try {
             while (!isDoneVerifiers()) {
-                WizBase.sleep(100);
+                WizThread.sleep(100);
                 if (shouldStop.get()) {
                     return;
                 }

@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import br.com.pointel.jarch.mage.WizChars;
+
+import br.com.pointel.jarch.mage.WizString;
 
 public class ArchUtils {
 
@@ -28,7 +29,7 @@ public class ArchUtils {
                 do {
                     serial++;
                     found = false;
-                    var newPrefix = prefix + WizChars.fillAtStart(serial + "", '0', length);
+                    var newPrefix = prefix + WizString.fillAtStart(serial + "", '0', length);
                     for (var file : folder.listFiles()) {
                         if (file.isFile() && file.getName().startsWith(newPrefix)) {
                             found = true;

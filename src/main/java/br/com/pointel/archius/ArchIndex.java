@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.lang3.tuple.Pair;
-import br.com.pointel.jarch.mage.WizChars;
+
+import br.com.pointel.jarch.mage.WizString;
 
 public class ArchIndex implements Closeable {
 
@@ -47,11 +49,11 @@ public class ArchIndex implements Closeable {
         var folder = file.getParentFile();
         var indexData = getIndexData(folder);
         var source = new DochReader(file).read();
-        var keyWords = WizChars.getWordsKeySetOrdered(source);
-        keyWords.addAll(WizChars.getWordsKeySetOrdered(file.getAbsolutePath()));
+        var keyWords = WizString.getWordsKeySetOrdered(source);
+        keyWords.addAll(WizString.getWordsKeySetOrdered(file.getAbsolutePath()));
         var words = " " + String.join(" ", keyWords) + " ";
-        var keyWordsLike = WizChars.getWordsLikeKeySetOrdered(source);
-        keyWordsLike.addAll(WizChars.getWordsLikeKeySetOrdered(file.getAbsolutePath()));
+        var keyWordsLike = WizString.getWordsLikeKeySetOrdered(source);
+        keyWordsLike.addAll(WizString.getWordsLikeKeySetOrdered(file.getAbsolutePath()));
         var likes = " " + String.join(" ", keyWordsLike) + " ";
         indexData.putFile(file.getName(), words, likes, file.lastModified());
         return Pair.of(words, likes);
@@ -99,11 +101,11 @@ public class ArchIndex implements Closeable {
                 }
             }
         }
-        var keyWords = WizChars.getWordsKeySetOrdered(sourceWords.toString());
-        keyWords.addAll(WizChars.getWordsKeySetOrdered(folder.getAbsolutePath()));
+        var keyWords = WizString.getWordsKeySetOrdered(sourceWords.toString());
+        keyWords.addAll(WizString.getWordsKeySetOrdered(folder.getAbsolutePath()));
         var words = " " + String.join(" ", keyWords) + " ";
-        var keyWordsLike = WizChars.getWordsLikeKeySetOrdered(sourceLikes.toString());
-        keyWordsLike.addAll(WizChars.getWordsLikeKeySetOrdered(folder.getAbsolutePath()));
+        var keyWordsLike = WizString.getWordsLikeKeySetOrdered(sourceLikes.toString());
+        keyWordsLike.addAll(WizString.getWordsLikeKeySetOrdered(folder.getAbsolutePath()));
         var likes = " " + String.join(" ", keyWordsLike) + " ";
         indexData.putFile("/.", words, likes, biggerLastModified);
         return Pair.of(words, likes);

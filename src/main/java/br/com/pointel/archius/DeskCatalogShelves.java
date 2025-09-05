@@ -10,7 +10,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import br.com.pointel.jarch.gears.WrapLayout;
+import br.com.pointel.jarch.gear.WrapLayout;
 
 public class DeskCatalogShelves extends JPanel {
 
