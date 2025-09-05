@@ -7,11 +7,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
+
 import br.com.pointel.jarch.data.EOrmSQLite;
 import br.com.pointel.jarch.data.Field;
+import br.com.pointel.jarch.data.Filter;
+import br.com.pointel.jarch.data.Index;
 import br.com.pointel.jarch.data.Nature;
+import br.com.pointel.jarch.data.Select;
 import br.com.pointel.jarch.data.Table;
 import br.com.pointel.jarch.data.TableHead;
+import br.com.pointel.jarch.data.Typed;
 
 public class ArchBaseData implements Closeable {
 
@@ -26,16 +31,11 @@ public class ArchBaseData implements Closeable {
     }
 
     public synchronized ArchBaseUnit getByPlace(String place) throws Exception {
-        var select = this.connection.prepareStatement(
-                        "SELECT place, verifier, modified FROM files "
-                                        + "WHERE place = ?");
-        select.setString(1, place);
-        var returned = select.executeQuery();
-        if (returned.next()) {
-            return new ArchBaseUnit(
-                            returned.getString("place"),
-                            returned.getString("verifier"),
-                            returned.getLong("modified"));
+        filterFilesByPlace.withValue(place);
+        var resultSet = eOrm.select(selectFilesByPlace);
+        if (resultSet.next()) {
+            var result = selectFilesByPlace.mapResult(resultSet, ArchBaseUnit.class);
+            return result;
         } else {
             return null;
         }
@@ -137,11 +137,9 @@ public class ArchBaseData implements Closeable {
         update.executeUpdate();
     }
 
-    private void initDatabase() throws Exception {
-        eOrm.create(FilesTable, true);
-        this.connection.createStatement().execute(
-                        "CREATE INDEX IF NOT EXISTS "
-                                        + "files_verifier ON files (verifier)");
+    private synchronized void initDatabase() throws Exception {
+        eOrm.createIfNotExists(tableFiles);
+        eOrm.createIfNotExists(indexFilesVerifier);
     }
 
     @Override
@@ -153,16 +151,29 @@ public class ArchBaseData implements Closeable {
         }
     }
     
-    private static Field FilesPlaceField = new Field("place", Nature.CHARS, true, true);
+    private static Field fieldFilesPlace = new Field("place", Nature.Chars, true, true);
 
-    private static Field FilesVerifierField = new Field("verifier", Nature.CHARS);
+    private static Typed typedFilesPlace = fieldFilesPlace.toTyped();
 
-    private static Field FilesModifiedField = new Field("modified", Nature.LONG);
+    private static Field fieldFilesVerifier = new Field("verifier", Nature.Chars);
 
-    private static Table FilesTable = new Table(
-        new TableHead("files"),
-        List.of(FilesPlaceField, FilesVerifierField, FilesModifiedField)
-    );
+    private static Typed typedFilesVerifier = fieldFilesVerifier.toTyped();
 
+    private static Field fieldFilesModified = new Field("modified", Nature.Long);
+
+    private static Typed typedFilesModified = fieldFilesModified.toTyped();
+
+    private static Table tableFiles = new Table(new TableHead("files"), 
+            List.of(fieldFilesPlace, fieldFilesVerifier, fieldFilesModified));
+
+    private static Index indexFilesVerifier = new Index("files_verifier", tableFiles.tableHead, 
+            List.of(fieldFilesVerifier));
+
+    private static Filter filterFilesByPlace = new Filter().withField(fieldFilesPlace);
+
+    private static Select selectFilesByPlace = new Select(tableFiles.tableHead, 
+            List.of(typedFilesPlace, typedFilesVerifier, typedFilesModified), null,
+            List.of(filterFilesByPlace));
+            
 }
 
