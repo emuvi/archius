@@ -31,49 +31,23 @@ public class ArchBaseData implements Closeable {
     }
 
     public synchronized ArchBaseUnit getByPlace(String place) throws Exception {
-        filterFilesByPlace.withValue(place);
-        return eOrm.select(selectFilesByPlace).mapResult(ArchBaseUnit.class);
+        return eOrm.select(selectFiles.withFilter(filterByPlace.withValue(place)))
+                .mapResult(ArchBaseUnit.class);
     }
 
     public synchronized List<ArchBaseUnit> getByVerifier(String verifier) throws Exception {
-        var select = this.connection.prepareStatement(
-                        "SELECT place, verifier, modified FROM files "
-                                        + "WHERE verifier = ?");
-        select.setString(1, verifier);
-        var returned = select.executeQuery();
-        var results = new ArrayList<ArchBaseUnit>();
-        while (returned.next()) {
-            results.add(new ArchBaseUnit(
-                            returned.getString("place"),
-                            returned.getString("verifier"),
-                            returned.getLong("modified")));
-        }
-        return results;
+        return eOrm.select(selectFiles.withFilter(filterByVerifier.withValue(verifier)))
+                .mapResults(ArchBaseUnit.class);
     }
 
     public synchronized List<ArchBaseUnit> getAll() throws Exception {
-        var select = this.connection.prepareStatement(
-                        "SELECT place, verifier, modified FROM files");
-        var returned = select.executeQuery();
-        var results = new ArrayList<ArchBaseUnit>();
-        while (returned.next()) {
-            results.add(new ArchBaseUnit(
-                            returned.getString("place"),
-                            returned.getString("verifier"),
-                            returned.getLong("modified")));
-        }
-        return results;
+        return eOrm.select(selectFiles.withNoFilter())
+                .mapResults(ArchBaseUnit.class);
     }
 
     public synchronized List<String> getAllPlaces() throws Exception {
-        var select = this.connection.prepareStatement(
-                        "SELECT place FROM files");
-        var returned = select.executeQuery();
-        var results = new ArrayList<String>();
-        while (returned.next()) {
-            results.add(returned.getString("place"));
-        }
-        return results;
+        return eOrm.select(selectFilesPlace.withNoFilter())
+                .mapResults(String.class);
     }
 
     public synchronized void putFile(String place, String verifier, Long modified) throws Exception {
@@ -133,7 +107,7 @@ public class ArchBaseData implements Closeable {
 
     private synchronized void initDatabase() throws Exception {
         eOrm.createIfNotExists(tableFiles);
-        eOrm.createIfNotExists(indexFilesVerifier);
+        eOrm.createIfNotExists(indexVerifier);
     }
 
     @Override
@@ -145,29 +119,33 @@ public class ArchBaseData implements Closeable {
         }
     }
     
-    private static Field fieldFilesPlace = new Field("place", Nature.Chars, true, true);
+    private static Field fieldPlace = new Field("place", Nature.Chars, true, true);
 
-    private static Typed typedFilesPlace = fieldFilesPlace.toTyped();
+    private static Typed typedPlace = fieldPlace.toTyped();
 
-    private static Field fieldFilesVerifier = new Field("verifier", Nature.Chars);
+    private static Field fieldVerifier = new Field("verifier", Nature.Chars);
 
-    private static Typed typedFilesVerifier = fieldFilesVerifier.toTyped();
+    private static Typed typedVerifier = fieldVerifier.toTyped();
 
-    private static Field fieldFilesModified = new Field("modified", Nature.Long);
+    private static Field fieldModified = new Field("modified", Nature.Long);
 
-    private static Typed typedFilesModified = fieldFilesModified.toTyped();
+    private static Typed typedModified = fieldModified.toTyped();
 
     private static Table tableFiles = new Table(new TableHead("files"), 
-            List.of(fieldFilesPlace, fieldFilesVerifier, fieldFilesModified));
+            List.of(fieldPlace, fieldVerifier, fieldModified));
 
-    private static Index indexFilesVerifier = new Index("files_verifier", tableFiles.tableHead, 
-            List.of(fieldFilesVerifier));
+    private static Index indexVerifier = new Index("files_verifier", tableFiles.tableHead, 
+            List.of(fieldVerifier));
 
-    private static Filter filterFilesByPlace = new Filter().withField(fieldFilesPlace);
+    private static Filter filterByPlace = new Filter().withField(fieldPlace);
 
-    private static Select selectFilesByPlace = new Select(tableFiles.tableHead, 
-            List.of(typedFilesPlace, typedFilesVerifier, typedFilesModified), null,
-            List.of(filterFilesByPlace));
+    private static Filter filterByVerifier = new Filter().withField(fieldVerifier);
+
+    private static Select selectFiles = new Select(tableFiles.tableHead, 
+            List.of(typedPlace, typedVerifier, typedModified));
+
+    private static Select selectFilesPlace = new Select(tableFiles.tableHead, 
+            List.of(typedPlace));
             
 }
 
