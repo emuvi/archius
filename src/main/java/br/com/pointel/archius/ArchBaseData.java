@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
 
+import br.com.pointel.jarch.data.Delete;
 import br.com.pointel.jarch.data.EOrmSQLite;
 import br.com.pointel.jarch.data.Field;
 import br.com.pointel.jarch.data.Index;
@@ -43,6 +44,9 @@ public class ArchBaseData implements Closeable {
     private final Select selectFilesPlace = selectFiles.uponFieldList(
             tableFiles.getFieldByName(fieldPlaceName).toTyped());
 
+    private final Insert insertFile = tableFiles.toInsert();
+    private final Delete deleteFile = tableFiles.toDelete();
+
     private final Connection connection;
     private final EOrmSQLite eOrm;
 
@@ -74,18 +78,9 @@ public class ArchBaseData implements Closeable {
     }
 
     public synchronized void putFile(String place, String verifier, Long modified) throws Exception {
-        var delete = this.connection.prepareStatement(
-                        "DELETE FROM files WHERE place = ?");
-        delete.setString(1, place);
-        delete.executeUpdate();
-        var insert = this.connection.prepareStatement(
-                        "INSERT INTO files (place, verifier, modified) " +
-                                        "VALUES (?, ?, ?)");
-        insert.setString(1, place);
-        insert.setString(2, verifier);
-        insert.setLong(3, modified);
-        var results = insert.executeUpdate();
-        if (results == 0) {
+        eOrm.delete(deleteFile.filterWithValues(place));
+        var inserted = eOrm.insert(insertFile.valuedWithValues(place, verifier, modified));
+        if (!inserted.hadEffect()) {
             throw new Exception("Could not put the file.");
         }
     }
