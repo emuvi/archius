@@ -10,42 +10,51 @@ import java.util.List;
 import br.com.pointel.jarch.data.Delete;
 import br.com.pointel.jarch.data.EOrmSQLite;
 import br.com.pointel.jarch.data.Field;
+import br.com.pointel.jarch.data.FilterLikes;
 import br.com.pointel.jarch.data.Index;
 import br.com.pointel.jarch.data.Insert;
 import br.com.pointel.jarch.data.Nature;
 import br.com.pointel.jarch.data.Select;
 import br.com.pointel.jarch.data.Table;
 import br.com.pointel.jarch.data.TableHead;
+import br.com.pointel.jarch.data.Update;
 
 public class ArchBaseData implements Closeable {
 
-    public static final String tableFilesName = "files";
+    public static final String TABLE_FILES_NAME = "files";
     
-    public static final String fieldPlaceName = "place";
-    public static final String fieldVerifierName = "verifier";
-    public static final String fieldModifiedName = "modified";
+    public static final String FIELD_PLACE_NAME = "place";
+    public static final String FIELD_VERIFIER_NAME = "verifier";
+    public static final String FIELD_MODIFIED_NAME = "modified";
 
-    public static final Table tableFiles = new Table(new TableHead(tableFilesName), 
-            List.of(
-                    new Field(fieldPlaceName, Nature.Chars, true, true),
-                    new Field(fieldVerifierName, Nature.Chars),
-                    new Field(fieldModifiedName, Nature.Long)
-            ));
+    public static final String FILES_VERIFIER_INDEX = "files_verifier";
 
-    public static final String indexVerifierName = "files_verifier";
+    public static final Field fieldPlace = new Field(FIELD_PLACE_NAME, Nature.Chars, true, true);
+    public static final Field fieldVerifier = new Field(FIELD_VERIFIER_NAME, Nature.Chars);
+    public static final Field fieldModified = new Field(FIELD_MODIFIED_NAME, Nature.Long);
 
-    public static final Index indexVerifier = new Index(indexVerifierName, tableFiles.tableHead, 
-            List.of(tableFiles.getFieldByName(fieldVerifierName)));
+    public static final Table tableFiles = new Table(new TableHead(TABLE_FILES_NAME), 
+            List.of(fieldPlace, fieldVerifier, fieldModified));
+
+    public static final Index indexVerifier = new Index(FILES_VERIFIER_INDEX, tableFiles.tableHead,
+            List.of(fieldVerifier));
+
 
     private final Select selectFilesByPlace = tableFiles.toSelect();
     private final Select selectFiles = selectFilesByPlace.uponNoFilterList();
-    private final Select selectFilesByVerifier = selectFiles.uponFilterList(
-            tableFiles.getFieldByName(fieldVerifierName).toFilter());
-    private final Select selectFilesPlace = selectFiles.uponFieldList(
-            tableFiles.getFieldByName(fieldPlaceName).toTyped());
+    private final Select selectFilesByVerifier = selectFiles
+            .uponFilterList(fieldVerifier.toFilter());
+    private final Select selectFilesPlace = selectFiles
+            .uponFieldList(fieldPlace.toTyped());
+    private final Select selectFilesPlaceByStartsWith = selectFilesPlace
+            .uponFilterList(fieldPlace.toFilter().withLikes(FilterLikes.StartsWith));
 
     private final Insert insertFile = tableFiles.toInsert();
     private final Delete deleteFile = tableFiles.toDelete();
+    private final Delete deleteFilesPlaceStartsWith = deleteFile
+            .uponFilterList(fieldPlace.toFilter().withLikes(FilterLikes.StartsWith));
+    private final Update updateFilePlace = tableFiles.toUpdate()
+            .withValuedList(fieldPlace.toValued());
 
     private final Connection connection;
     private final EOrmSQLite eOrm;
@@ -79,48 +88,37 @@ public class ArchBaseData implements Closeable {
 
     public synchronized void putFile(String place, String verifier, Long modified) throws Exception {
         eOrm.delete(deleteFile.filterWithValues(place));
-        var inserted = eOrm.insert(insertFile.valuedWithValues(place, verifier, modified));
+        var inserted = eOrm.insert(insertFile
+                .valuedWithValues(place, verifier, modified));
         if (!inserted.hadEffect()) {
             throw new Exception("Could not put the file.");
         }
     }
 
     public synchronized void delFolder(String place) throws Exception {
-        var delete = this.connection.prepareStatement(
-                        "DELETE FROM files WHERE place LIKE ?");
-        delete.setString(1, place + "%");
-        delete.executeUpdate();
+        eOrm.delete(deleteFilesPlaceStartsWith
+                .filterWithValues(place));
     }
 
     public synchronized void delFile(String place) throws Exception {
-        var delete = this.connection.prepareStatement(
-                        "DELETE FROM files WHERE place = ?");
-        delete.setString(1, place);
-        delete.executeUpdate();
+        eOrm.delete(deleteFile
+                .filterWithValues(place));
     }
 
-    public synchronized void moveFolder(String fromPlace, String toPlace) throws Exception {
-        var select = this.connection.prepareStatement(
-                        "SELECT place FROM files WHERE place LIKE ?");
-        select.setString(1, fromPlace + "%");
-        var returned = select.executeQuery();
-        while (returned.next()) {
-            var oldPlace = returned.getString("place");
+    public synchronized void moveFolder(String fromPlace, String toPlace) throws Exception {       
+        var oldPlaces = eOrm.select(selectFilesPlaceByStartsWith
+                .filterWithValues(fromPlace))
+                        .mapResults(String.class);
+        for (var oldPlace : oldPlaces) {
             var newPlace = toPlace + oldPlace.substring(fromPlace.length());
-            var update = this.connection.prepareStatement(
-                            "UPDATE files SET place = ? WHERE place = ?");
-            update.setString(1, newPlace);
-            update.setString(2, oldPlace);
-            update.executeUpdate();
+            moveFile(oldPlace, newPlace);
         }
     }
 
     public synchronized void moveFile(String fromPlace, String toPlace) throws Exception {
-        var update = this.connection.prepareStatement(
-                        "UPDATE files SET place = ? WHERE place = ?");
-        update.setString(1, toPlace);
-        update.setString(2, fromPlace);
-        update.executeUpdate();
+        eOrm.update(updateFilePlace
+                .valuedWithValues(toPlace)
+                .filterWithValues(fromPlace));
     }
 
     private synchronized void initDatabase() throws Exception {
@@ -138,4 +136,3 @@ public class ArchBaseData implements Closeable {
     }
                 
 }
-
