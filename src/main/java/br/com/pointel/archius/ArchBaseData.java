@@ -27,7 +27,7 @@ public class ArchBaseData implements Closeable {
     public static final String FIELD_VERIFIER_NAME = "verifier";
     public static final String FIELD_MODIFIED_NAME = "modified";
 
-    public static final String FILES_VERIFIER_INDEX = "files_verifier";
+    public static final String INDEX_VERIFIER_NAME = "files_verifier";
 
     public static final Field fieldPlace = new Field(FIELD_PLACE_NAME, Nature.Chars, true, true);
     public static final Field fieldVerifier = new Field(FIELD_VERIFIER_NAME, Nature.Chars);
@@ -36,7 +36,7 @@ public class ArchBaseData implements Closeable {
     public static final Table tableFiles = new Table(new TableHead(TABLE_FILES_NAME), 
             List.of(fieldPlace, fieldVerifier, fieldModified));
 
-    public static final Index indexVerifier = new Index(FILES_VERIFIER_INDEX, tableFiles.tableHead,
+    public static final Index indexVerifier = new Index(INDEX_VERIFIER_NAME, tableFiles.tableHead,
             List.of(fieldVerifier));
 
 
