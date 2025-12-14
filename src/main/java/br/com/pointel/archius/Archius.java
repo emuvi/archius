@@ -1,5 +1,6 @@
 package br.com.pointel.archius;
 
+import br.com.pointel.jarch.mage.WizApp;
 import br.com.pointel.jarch.mage.WizProps;
 
 public class Archius {
